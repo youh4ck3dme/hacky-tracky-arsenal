@@ -177,8 +177,8 @@ Otvor [devpost.com](https://devpost.com) → Submit project. Texty kopíruj z [D
 ### Placeholdery — doplni v DEVPOST pred copy-paste
 
 ```text
-Team members:     [TVOJE MENO / NÁZOV TÍMU]
-GitHub URL:       https://github.com/[user]/[repo]
+Team members:     youh4ck3dme
+GitHub URL:       https://github.com/youh4ck3dme/hacky-tracky-arsenal
 Video URL:        https://youtube.com/watch?v=...   alebo Devpost upload
 License:          MIT
 ```
@@ -206,7 +206,7 @@ git init
 git add .
 git commit -m "Hacky Tracky Arsenal PWA with Schrödinger Scan"
 git branch -M main
-git remote add origin https://github.com/TVOJ-USER/TVOJ-REPO.git
+git remote add origin https://github.com/youh4ck3dme/hacky-tracky-arsenal.git
 git push -u origin main
 ```
 

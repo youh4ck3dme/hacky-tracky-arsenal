@@ -2,6 +2,20 @@
 
 Inštalovateľná webová aplikácia, ktorá nahrádza terminálové menu `hacky-admin-menu.sh` — dashboard 5 kategórií arzenálu, live status nástrojov, job queue so streamom logov, offline cache a Schrödinger Scan recon modul.
 
+## Repository
+
+- **GitHub:** https://github.com/youh4ck3dme/hacky-tracky-arsenal
+- **License:** MIT
+
+```bash
+git clone https://github.com/youh4ck3dme/hacky-tracky-arsenal.git
+cd hacky-tracky-arsenal
+cp .env.example .env
+./start.sh
+```
+
+`H4CK_ROOT` v `.env` musí ukazovať na rodičovský `h4ck/` arzenál (obsahuje `hacky-admin-menu.sh`, `resolvers/`). Pri clone vedľa existujúceho `h4ck/` stačí default `../`.
+
 ## Požiadavky
 
 - Node.js 20+, pnpm

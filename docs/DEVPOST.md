@@ -9,16 +9,16 @@ Kompletný manuál (screenshoty, video, timeline): [SUBMISSION-MANUAL.md](SUBMIS
 Doplň pred copy-paste na Devpost.com:
 
 ```text
-Team members:
-GitHub URL:
+Team members:     youh4ck3dme
+GitHub URL:       https://github.com/youh4ck3dme/hacky-tracky-arsenal
 Video URL:
 License:          MIT
 ```
 
 | Pole | Tvoja hodnota |
 |------|---------------|
-| Team members | |
-| GitHub URL | |
+| Team members | youh4ck3dme |
+| GitHub URL | https://github.com/youh4ck3dme/hacky-tracky-arsenal |
 | Video URL | |
 | License | MIT |
 
@@ -120,11 +120,13 @@ FIND EVIL! asks builders to create defenders that respond in seconds. Schröding
 ## Try it out
 
 ```bash
-cd h4ck/arsenal-pwa
+git clone https://github.com/youh4ck3dme/hacky-tracky-arsenal.git
+cd hacky-tracky-arsenal
 cp .env.example .env
 ./start.sh
 # Frontend: http://127.0.0.1:5173
 # Token: value from .env (default: dev-token-change-me)
+# Set H4CK_ROOT in .env to your h4ck/ arsenal directory if not ../
 ```
 
 ---
