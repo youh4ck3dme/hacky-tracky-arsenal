@@ -1,0 +1,34 @@
+{
+  "name": "arsenal-pwa",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter arsenal-backend dev\" \"pnpm --filter arsenal-frontend dev\"",
+    "build": "pnpm --filter arsenal-backend build && pnpm --filter arsenal-frontend build",
+    "start": "pnpm --filter arsenal-backend start",
+    "start:all": "./start.sh",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "./scripts/smoke-test.sh",
+    "test:all": "vitest run && ./scripts/smoke-test.sh"
+  },
+  "packageManager": "pnpm@11.5.2",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.0.10",
+    "@types/supertest": "^6.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "jsdom": "^26.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "supertest": "^7.0.0",
+    "vitest": "^3.0.9"
+  }
+}

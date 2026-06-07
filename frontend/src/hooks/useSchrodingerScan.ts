@@ -1,0 +1,108 @@
+import { useEffect, useState } from 'react';
+import { getToken } from '../lib/api';
+import type {
+  ScanProgress,
+  ScanStatus,
+  SchrodingerScan,
+  VantageFinding,
+  VantageResult,
+} from '../types/schrodinger';
+
+export function useSchrodingerScan(scanId: string | null) {
+  const [vantages, setVantages] = useState<VantageResult[]>([]);
+  const [matrix, setMatrix] = useState<VantageFinding[]>([]);
+  const [progress, setProgress] = useState<ScanProgress | null>(null);
+  const [status, setStatus] = useState<ScanStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    if (!scanId) return;
+
+    setVantages([]);
+    setMatrix([]);
+    setProgress(null);
+    setStatus('running');
+    setError(null);
+
+    const token = getToken();
+    const url = `/api/schrodinger/scans/${scanId}/stream`;
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const controller = new AbortController();
+    let buffer = '';
+
+    async function connect() {
+      try {
+        const res = await fetch(url, { headers, signal: controller.signal });
+        if (!res.ok || !res.body) {
+          setConnected(false);
+          return;
+        }
+
+        setConnected(true);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let eventType = 'message';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split('\n\n');
+          buffer = parts.pop() ?? '';
+
+          for (const part of parts) {
+            const lines = part.split('\n');
+            let data = '';
+            for (const line of lines) {
+              if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+              else if (line.startsWith('data: ')) data = line.slice(6);
+            }
+            if (!data) continue;
+
+            const parsed = JSON.parse(data);
+            if (eventType === 'vantage') {
+              setVantages((prev) => {
+                const next = prev.filter((v) => v.id !== parsed.id);
+                return [...next, parsed as VantageResult];
+              });
+            } else if (eventType === 'finding') {
+              setMatrix((prev) => [...prev, parsed as VantageFinding]);
+            } else if (eventType === 'progress') {
+              setProgress(parsed as ScanProgress);
+            } else if (eventType === 'done') {
+              setStatus(parsed.status as ScanStatus);
+              setError(parsed.error ?? null);
+            }
+          }
+        }
+      } catch {
+        if (!controller.signal.aborted) setConnected(false);
+      }
+    }
+
+    connect();
+    return () => {
+      controller.abort();
+      setConnected(false);
+    };
+  }, [scanId]);
+
+  return { vantages, matrix, progress, status, error, connected };
+}
+
+export function mergeScanWithStream(
+  initial: SchrodingerScan,
+  stream: ReturnType<typeof useSchrodingerScan>,
+): SchrodingerScan {
+  return {
+    ...initial,
+    status: stream.status ?? initial.status,
+    vantages: stream.vantages.length > 0 ? stream.vantages : initial.vantages,
+    matrix: stream.matrix.length > 0 ? stream.matrix : initial.matrix,
+    error: stream.error ?? initial.error,
+  };
+}

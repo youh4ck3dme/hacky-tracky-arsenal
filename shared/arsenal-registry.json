@@ -1,0 +1,156 @@
+{
+  "version": "1.0.0",
+  "modules": [
+    {
+      "id": "exploit",
+      "name": "Exploit Tools",
+      "description": "Kali, LinEnum, PEASS",
+      "script": "exploit-tools.sh",
+      "icon": "shield",
+      "toolIds": ["exploitdb", "linenum", "peass-ng"]
+    },
+    {
+      "id": "web",
+      "name": "Web Hacking",
+      "description": "SecLists, WP Exploits, WPScan",
+      "script": "web-hacking.sh",
+      "icon": "globe",
+      "toolIds": ["seclists", "wordpress-exploit-framework", "wpscan"]
+    },
+    {
+      "id": "network",
+      "name": "Network Tools",
+      "description": "masscan, zmap, bettercap",
+      "script": "network-tools.sh",
+      "icon": "network",
+      "toolIds": ["masscan", "zmap", "bettercap"]
+    },
+    {
+      "id": "malware",
+      "name": "Malware & Phishing",
+      "description": "zphisher, theZoo, CredHarvester",
+      "script": "malware-tools.sh",
+      "icon": "bug",
+      "toolIds": ["thezoo", "credential-harvester", "zphisher"]
+    },
+    {
+      "id": "ai",
+      "name": "AI / OSINT Tools",
+      "description": "AI-Hacking, resolvers, pyWhat",
+      "script": "ai-tools.sh",
+      "icon": "brain",
+      "toolIds": ["resolvers", "pywhat", "ai-hacking-tools"]
+    },
+    {
+      "id": "full",
+      "name": "Full Install",
+      "description": "Spusti všetky moduly",
+      "script": "full-install.sh",
+      "icon": "rocket",
+      "toolIds": [
+        "exploitdb", "linenum", "peass-ng",
+        "seclists", "wordpress-exploit-framework", "wpscan",
+        "masscan", "zmap", "bettercap",
+        "thezoo", "credential-harvester", "zphisher",
+        "resolvers", "pywhat", "ai-hacking-tools"
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "id": "exploitdb",
+      "name": "ExploitDB",
+      "repoDir": "exploitdb",
+      "category": "exploit"
+    },
+    {
+      "id": "linenum",
+      "name": "LinEnum",
+      "repoDir": "LinEnum",
+      "category": "exploit"
+    },
+    {
+      "id": "peass-ng",
+      "name": "PEASS-ng",
+      "repoDir": "PEASS-ng",
+      "category": "exploit"
+    },
+    {
+      "id": "seclists",
+      "name": "SecLists",
+      "repoDir": "SecLists",
+      "category": "web"
+    },
+    {
+      "id": "wordpress-exploit-framework",
+      "name": "Wordpress Exploit Framework",
+      "repoDir": "Wordpress-Exploit-Framework",
+      "category": "web",
+      "optional": true
+    },
+    {
+      "id": "wpscan",
+      "name": "WPScan",
+      "repoDir": "wpscan",
+      "category": "web",
+      "healthCheck": {
+        "type": "fileExists",
+        "paths": ["wpscan/lib/wpscan.rb", "wpscan/bin/wpscan"]
+      }
+    },
+    {
+      "id": "masscan",
+      "name": "masscan",
+      "repoDir": "masscan",
+      "category": "network"
+    },
+    {
+      "id": "zmap",
+      "name": "zmap",
+      "repoDir": "zmap",
+      "category": "network"
+    },
+    {
+      "id": "bettercap",
+      "name": "bettercap",
+      "repoDir": "bettercap",
+      "category": "network"
+    },
+    {
+      "id": "thezoo",
+      "name": "theZoo",
+      "repoDir": "theZoo",
+      "category": "malware"
+    },
+    {
+      "id": "credential-harvester",
+      "name": "Credential Harvester (SET)",
+      "repoDir": "Credential-Harvester",
+      "category": "malware"
+    },
+    {
+      "id": "zphisher",
+      "name": "zphisher",
+      "repoDir": "zphisher",
+      "category": "malware"
+    },
+    {
+      "id": "resolvers",
+      "name": "resolvers",
+      "repoDir": "resolvers",
+      "category": "ai"
+    },
+    {
+      "id": "pywhat",
+      "name": "pyWhat",
+      "repoDir": "pyWhat",
+      "category": "ai"
+    },
+    {
+      "id": "ai-hacking-tools",
+      "name": "AI Hacking Tools",
+      "repoDir": "AI-Hacking-Tools",
+      "category": "ai"
+    }
+  ]
+}
