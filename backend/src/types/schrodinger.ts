@@ -1,5 +1,5 @@
-export type FindingState = 'collapsed' | 'quantum' | 'absent';
-export type VantageId = 'dns' | 'ua' | 'netweb';
+export type FindingState = 'collapsed' | 'quantum' | 'absent' | 'temporal';
+export type VantageId = 'dns' | 'ua' | 'netweb' | 'time';
 export type ScanStatus = 'queued' | 'running' | 'completed' | 'failed';
 
 export interface VantageFinding {
@@ -17,6 +17,18 @@ export interface VantageResult {
   summary: string;
 }
 
+/**
+ * A single period (year) in the Palimpsest timeline — reconstructed from the
+ * Wayback Machine. Powers the time-slider UI: attack surface as sediment.
+ */
+export interface TimelineSnapshot {
+  period: string;
+  totalSnapshots: number;
+  uniquePaths: number;
+  samplePaths: string[];
+  statuses: Record<string, number>;
+}
+
 export interface SchrodingerScan {
   id: string;
   target: string;
@@ -25,6 +37,7 @@ export interface SchrodingerScan {
   finishedAt: string | null;
   vantages: VantageResult[];
   matrix: VantageFinding[];
+  timeline: TimelineSnapshot[];
   error: string | null;
 }
 

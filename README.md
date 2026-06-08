@@ -109,13 +109,26 @@ Automaticky hotové: `./start.sh`, `./scripts/preflight.sh`, smoke test, UI, EN 
 
 > „CVE nie je fakt — je superpozícia, kým ju nezměříš z správneho uhla.“
 
-Záložka **Schrödinger** v UI — jeden target, 3 vantage points:
+Záložka **Schrödinger** v UI — jeden target, 4 vantage points (3× *kde* + 1× *kedy*):
 
 1. **DNS** — vzorka 30 resolverov z `h4ck/resolvers/resolvers.txt`
 2. **User-Agent** — Chrome, Googlebot, curl HTTP fingerprint
 3. **Network vs Web** — TCP port probe + HTTP path fingerprint
+4. **Time · Palimpsest** — historické vrstvy z Wayback Machine (CDX), timeline slider po rokoch + detekcia „ghost paths" (cesta verejná v minulosti, dnes absent)
 
-Findingy: `collapsed` (všetci súhlasia), `quantum` (rozpor), `absent` (nedetegované).
+Findingy: `collapsed` (všetci súhlasia), `quantum` (rozpor medzi uhlami), `temporal` (rozpor v čase — superpozícia minulosť vs dnes), `absent` (nedetegované).
+
+> Attack surface nie je snapshot, je sediment. Palimpsest pridáva čas ako 4. uhol pozorovania — bez API kľúča, čisto cez verejné Wayback CDX.
+
+### Shadow Diff — `git diff` pre attack surface
+
+Každý dokončený scan sa uloží do IndexedDB ako baseline pre daný target. Pri ďalšom scane (napr. po reconnecte) sa porovná predošlý cached stav s novým:
+
+- `+` nový signál (napr. quantum/temporal, ktorý pribudol)
+- `−` signál, ktorý zanikol
+- `~` vantage, ktorý zmenil headline stav (napr. `collapsed → quantum`)
+
+Ak nastala zmena, PWA pošle notifikáciu do zariadenia („Lab target X sa zmenil — +2 nových signálov…"). Defenzívny monitoring bez SIEM ceny — diff pre *neistotu*, nie pre súbory.
 
 ## PWA — Add to Home Screen
 

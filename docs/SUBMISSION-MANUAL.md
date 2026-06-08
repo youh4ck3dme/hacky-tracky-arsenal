@@ -83,7 +83,7 @@ cd h4ck/arsenal-pwa
 
 - [ ] Tab **Schrödinger**
 - [ ] Scan `example.com` dokončený (alebo použij pre-warmed výsledok)
-- [ ] Viditeľné **3 vantage stĺpce** (DNS, User-Agent, Network vs Web)
+- [ ] Viditeľné **4 vantage stĺpce** (DNS, User-Agent, Network vs Web, Time · Palimpsest) + timeline slider
 - [ ] Sekcia **Quantum Matrix** s aspoň jedným **amber Quantum** badge
 - Ulož ako `docs/screenshots/03-schrodinger-quantum-matrix.png`
 

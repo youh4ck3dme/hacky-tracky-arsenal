@@ -32,7 +32,7 @@ Po doplnení skopíruj sekcie nižšie do príslušných polí na Devpost.
 
 ## Elevator Pitch (max 200 chars)
 
-Installable PWA for pentest labs. Manage 15 security tools from your phone. Schrödinger Scan observes targets from 3 vantage points and classifies findings as collapsed, quantum, or absent.
+Installable PWA for pentest labs. Manage 15 security tools from your phone. Schrödinger Scan observes targets from 4 vantage points (incl. time) and classifies findings as collapsed, quantum, temporal, or absent.
 
 ---
 
@@ -59,6 +59,7 @@ Security teams trust single-point scans. One `nmap`, one `curl`, one DNS lookup 
 - **Vantage 1 — DNS:** 30 resolvers sampled from 17,000+ (`resolvers.txt`)
 - **Vantage 2 — User-Agent:** Chrome, Googlebot, curl HTTP fingerprints
 - **Vantage 3 — Network vs Web:** TCP probes (80,443,22,8080,8443) + HTTP paths (`/`, `/wp-admin`, `/robots.txt`)
+- **Vantage 4 — Time (Palimpsest):** Wayback Machine CDX history → per-year timeline slider + "ghost path" detection (public in the past, absent today = *temporal superposition*). No API key required.
 - **Output:** Quantum Matrix — findings tagged `collapsed` | `quantum` | `absent`
 - Live SSE progress during scan
 
@@ -102,7 +103,7 @@ Security teams trust single-point scans. One `nmap`, one `curl`, one DNS lookup 
 
 ## What's next
 
-- Palimpsest module: temporal attack-surface layers (Wayback + ghost paths)
+- Palimpsest temporal ports: historical port state via SecurityTrails/Shodan (today: Wayback HTTP paths + ghost detection are live)
 - Schrödinger scan history + JSON export for reports
 - DNS Grand Prix animation (resolver race visualization)
 - Optional WPScan/masscan scan jobs (beyond install-only)

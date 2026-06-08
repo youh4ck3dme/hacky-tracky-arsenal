@@ -4,3 +4,9 @@ dist/
 .DS_Store
 .env
 backend/data/jobs.json
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

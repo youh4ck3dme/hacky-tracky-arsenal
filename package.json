@@ -15,10 +15,14 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "./scripts/smoke-test.sh",
+    "test:browser": "playwright test",
+    "test:browser:headed": "playwright test --headed",
+    "test:browser:report": "playwright show-report",
     "test:all": "vitest run && ./scripts/smoke-test.sh"
   },
   "packageManager": "pnpm@11.5.2",
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.10",

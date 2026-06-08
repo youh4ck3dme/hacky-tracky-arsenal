@@ -106,7 +106,7 @@ done
 
 SINFO=$(echo "$SCAN_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.status+' vantages='+s.vantages.length+' matrix='+s.matrix.length)")
 VC=$(echo "$SCAN_JSON" | node -e "process.stdout.write(String(JSON.parse(require('fs').readFileSync(0,'utf8')).vantages.length))")
-[[ "$SSTATUS" == "completed" && "$VC" == "3" ]] && pass "8. Schrödinger completed ($SINFO)" || fail "8. Schrödinger ($SINFO)"
+[[ "$SSTATUS" == "completed" && "$VC" == "4" ]] && pass "8. Schrödinger completed ($SINFO)" || fail "8. Schrödinger ($SINFO)"
 
 echo ""
 echo "=== ALL SMOKE TESTS PASSED ==="

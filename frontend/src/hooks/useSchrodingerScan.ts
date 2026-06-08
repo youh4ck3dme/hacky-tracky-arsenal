@@ -4,6 +4,7 @@ import type {
   ScanProgress,
   ScanStatus,
   SchrodingerScan,
+  TimelineSnapshot,
   VantageFinding,
   VantageResult,
 } from '../types/schrodinger';
@@ -11,19 +12,28 @@ import type {
 export function useSchrodingerScan(scanId: string | null) {
   const [vantages, setVantages] = useState<VantageResult[]>([]);
   const [matrix, setMatrix] = useState<VantageFinding[]>([]);
+  const [timeline, setTimeline] = useState<TimelineSnapshot[]>([]);
   const [progress, setProgress] = useState<ScanProgress | null>(null);
   const [status, setStatus] = useState<ScanStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
 
-  useEffect(() => {
-    if (!scanId) return;
-
+  // Reset synchronously when the scan changes so consumers never observe the
+  // previous scan's (completed) results during the render that swaps scanId.
+  const [trackedScanId, setTrackedScanId] = useState(scanId);
+  if (scanId !== trackedScanId) {
+    setTrackedScanId(scanId);
     setVantages([]);
     setMatrix([]);
+    setTimeline([]);
     setProgress(null);
-    setStatus('running');
+    setStatus(scanId ? 'running' : null);
     setError(null);
+    setConnected(false);
+  }
+
+  useEffect(() => {
+    if (!scanId) return;
 
     const token = getToken();
     const url = `/api/schrodinger/scans/${scanId}/stream`;
@@ -71,6 +81,8 @@ export function useSchrodingerScan(scanId: string | null) {
               });
             } else if (eventType === 'finding') {
               setMatrix((prev) => [...prev, parsed as VantageFinding]);
+            } else if (eventType === 'timeline') {
+              setTimeline(parsed as TimelineSnapshot[]);
             } else if (eventType === 'progress') {
               setProgress(parsed as ScanProgress);
             } else if (eventType === 'done') {
@@ -91,7 +103,7 @@ export function useSchrodingerScan(scanId: string | null) {
     };
   }, [scanId]);
 
-  return { vantages, matrix, progress, status, error, connected };
+  return { vantages, matrix, timeline, progress, status, error, connected };
 }
 
 export function mergeScanWithStream(
@@ -103,6 +115,7 @@ export function mergeScanWithStream(
     status: stream.status ?? initial.status,
     vantages: stream.vantages.length > 0 ? stream.vantages : initial.vantages,
     matrix: stream.matrix.length > 0 ? stream.matrix : initial.matrix,
+    timeline: stream.timeline.length > 0 ? stream.timeline : initial.timeline,
     error: stream.error ?? initial.error,
   };
 }

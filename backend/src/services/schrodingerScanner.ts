@@ -6,15 +6,22 @@ import { promisify } from 'node:util';
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config.js';
 import type {
-  FindingState,
   ScanProgress,
   SchrodingerListener,
   SchrodingerScan,
+  TimelineSnapshot,
   VantageFinding,
   VantageId,
   VantageResult,
 } from '../types/schrodinger.js';
 import { classifyMatrix } from './schrodingerMatrix.js';
+import {
+  buildCdxUrl,
+  buildTimeline,
+  historical200Paths,
+  parseCdx,
+  pickAcrossSpan,
+} from './palimpsest.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -65,6 +72,9 @@ class SchrodingerScannerService {
       for (const v of scan.vantages) {
         listener('vantage', v);
       }
+      if (scan.timeline.length > 0) {
+        listener('timeline', scan.timeline);
+      }
       for (const f of scan.matrix) {
         listener('finding', f);
       }
@@ -96,6 +106,7 @@ class SchrodingerScannerService {
       finishedAt: null,
       vantages: [],
       matrix: [],
+      timeline: [],
       error: null,
     };
 
@@ -130,6 +141,12 @@ class SchrodingerScannerService {
       scan.vantages.push(netweb);
       this.emit(scanId, 'vantage', netweb);
 
+      const time = await this.scanTime(scan.target, scanId);
+      scan.vantages.push(time.vantage);
+      scan.timeline = time.timeline;
+      this.emit(scanId, 'vantage', time.vantage);
+      this.emit(scanId, 'timeline', time.timeline);
+
       scan.matrix = classifyMatrix(scan.vantages);
       for (const finding of scan.matrix) {
         this.emit(scanId, 'finding', finding);
@@ -137,7 +154,7 @@ class SchrodingerScannerService {
 
       scan.status = 'completed';
       scan.finishedAt = new Date().toISOString();
-      this.emitProgress(scanId, { vantage: 'done', label: 'done', current: 3, total: 3 });
+      this.emitProgress(scanId, { vantage: 'done', label: 'done', current: 4, total: 4 });
       this.emit(scanId, 'done', { status: 'completed', error: null });
     } catch (err) {
       scan.status = 'failed';
@@ -426,6 +443,159 @@ class SchrodingerScannerService {
         : 'Target appears silent on network and web probes';
 
     return { id: 'netweb', name: 'Network vs Web', findings, summary };
+  }
+
+  private async fetchCdxRows(target: string): Promise<ReturnType<typeof parseCdx>> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      const res = await fetch(buildCdxUrl(target, 1000), {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'arsenal-pwa-palimpsest/1.0' },
+      });
+      if (!res.ok) return [];
+      return parseCdx(await res.json());
+    } catch {
+      return [];
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  private async scanTime(
+    target: string,
+    scanId: string,
+  ): Promise<{ vantage: VantageResult; timeline: TimelineSnapshot[] }> {
+    const findings: VantageFinding[] = [];
+
+    try {
+      this.emitProgress(scanId, {
+        vantage: 'time',
+        label: 'querying Wayback archive',
+        current: 1,
+        total: 3,
+      });
+
+      const rows = await this.fetchCdxRows(target);
+
+      if (rows.length === 0) {
+        findings.push({
+          id: 'time-no-history',
+          label: 'No archival history',
+          detail: 'Wayback Machine has no snapshots (or was unreachable)',
+          state: 'absent',
+          vantage: 'time',
+        });
+        return {
+          vantage: {
+            id: 'time',
+            name: 'Time · Palimpsest',
+            findings,
+            summary: 'No temporal data available',
+          },
+          timeline: [],
+        };
+      }
+
+      this.emitProgress(scanId, {
+        vantage: 'time',
+        label: 'reconstructing timeline',
+        current: 2,
+        total: 3,
+      });
+
+      const timeline = buildTimeline(rows);
+      const firstYear = timeline[0]?.period ?? '?';
+      const lastYear = timeline[timeline.length - 1]?.period ?? '?';
+
+      const candidates = pickAcrossSpan(
+        [...historical200Paths(rows).entries()].sort((a, b) =>
+          a[1].localeCompare(b[1]),
+        ),
+        8,
+      );
+
+      let ghostCount = 0;
+      let persistentCount = 0;
+
+      for (let i = 0; i < candidates.length; i++) {
+        const [p, year] = candidates[i];
+        const urlPath = p.startsWith('/') ? p : `/${p}`;
+        this.emitProgress(scanId, {
+          vantage: 'time',
+          label: `re-check ${urlPath}`,
+          current: 3,
+          total: 3,
+        });
+
+        const live = await this.probeHttpPath(target, urlPath);
+        const alive = live.status >= 200 && live.status < 400;
+        if (alive) {
+          persistentCount++;
+          findings.push({
+            id: `time-persist-${i}`,
+            label: `persistent ${urlPath}`,
+            detail: `HTTP 200 in ${year}, still HTTP ${live.status} today`,
+            state: 'collapsed',
+            vantage: 'time',
+          });
+        } else {
+          ghostCount++;
+          findings.push({
+            id: `time-ghost-${i}`,
+            label: `ghost ${urlPath}`,
+            detail: `HTTP 200 in ${year}, now ${
+              live.status === 0 ? 'unreachable' : `HTTP ${live.status}`
+            } — temporal superposition`,
+            state: 'temporal',
+            vantage: 'time',
+          });
+        }
+      }
+
+      if (ghostCount > 0) {
+        findings.unshift({
+          id: 'time-temporal-summary',
+          label: 'Ghost surface detected',
+          detail: `${ghostCount} path(s) public in the past, absent today · archive span ${firstYear}–${lastYear}`,
+          state: 'temporal',
+          vantage: 'time',
+        });
+      }
+
+      const summary =
+        ghostCount > 0
+          ? `Temporal: ${ghostCount} ghost · ${persistentCount} persistent paths across ${timeline.length} year(s) (${firstYear}–${lastYear})`
+          : `Collapsed in time: ${persistentCount} persistent paths, archive ${firstYear}–${lastYear}`;
+
+      return {
+        vantage: {
+          id: 'time',
+          name: `Time · Palimpsest (${firstYear}–${lastYear})`,
+          findings,
+          summary,
+        },
+        timeline,
+      };
+    } catch {
+      return {
+        vantage: {
+          id: 'time',
+          name: 'Time · Palimpsest',
+          findings: [
+            {
+              id: 'time-error',
+              label: 'Temporal scan degraded',
+              detail: 'Could not reconstruct archival history',
+              state: 'absent',
+              vantage: 'time',
+            },
+          ],
+          summary: 'Temporal scan unavailable',
+        },
+        timeline: [],
+      };
+    }
   }
 }
 

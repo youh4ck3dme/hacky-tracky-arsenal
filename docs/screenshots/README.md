@@ -10,7 +10,7 @@ Detailný popis: [SCREENSHOTS.md](../SCREENSHOTS.md)
 |------|--------|----------|
 | `01-arsenal-dashboard.png` | [ ] | Arsenal tab, 5 modules, badges, H4CK_ROOT footer |
 | `02-job-sse-logs.png` | [ ] | Job modal mid-run, progress, `● live`, log lines |
-| `03-schrodinger-quantum-matrix.png` | [ ] | 3 vantage columns + amber Quantum badge |
+| `03-schrodinger-quantum-matrix.png` | [ ] | 4 vantage columns (vrátane Time · Palimpsest) + Quantum/Temporal badge + timeline slider |
 
 **Rýchly postup:**
 
