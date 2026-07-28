@@ -1,3 +1,4 @@
+import { isEnabled } from '../../schrodinger/featureFlags.js';
 import type { SchrodingerFlags } from './flags.js';
 
 const TARGET_REGEX = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
@@ -32,6 +33,8 @@ function hostAllowed(host: string, entry: string): boolean {
 }
 
 export function assertAllowlisted(target: string, flags: SchrodingerFlags): void {
+  // FEATURE_schrodinger_guardrails=false → MVP open allow (still validates domain shape)
+  if (!isEnabled('schrodinger.guardrails')) return;
   if (flags.allowAllDomains) return;
   if (flags.allowlist.length === 0) {
     throw new AllowlistDeniedError(target);

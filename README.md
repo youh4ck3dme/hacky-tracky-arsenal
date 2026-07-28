@@ -119,11 +119,14 @@ Záložka **Schrödinger** v UI — jeden target, 4 vantage points (3× *kde* + 
 
 Findingy: `collapsed` | `quantum` | `temporal` | `absent`. Rules: `shared/schrodinger-rules.json` → severity, risk weight, `next_actions[]`.
 
-**Guardrails:** `SCHRODINGER_ALLOWLIST` + blok súkromných/metadata IP po resolve. Feature flags: `SCHRODINGER_VANTAGES`, `SCHRODINGER_DNS_MODE`, `SCHRODINGER_SCAN_MODE=mock|live`.
+**Guardrails:** `SCHRODINGER_ALLOWLIST` (+ alias `SCHRODINGER_TARGET_ALLOWLIST`) + SSRF IP block.  
+**FEATURE_\*:** `schrodinger.guardrails` (on) · `persist.postgres` (off) · `v2_providers` (on).  
+**Runtime:** `SCHRODINGER_VANTAGES`, `SCHRODINGER_DNS_MODE`, `SCHRODINGER_SCAN_MODE=mock|live`, `SCHRODINGER_MAX_CONCURRENT`.
 
-**CI:** mock scan p95 &lt; 3s. Live dig na `example.com` soft target &lt; 90s. GCP: GCE/Cloud Shell s `dig`, alebo mock bez dig.
+**CI:** mock scan p95 &lt; 3s. Live dig na `example.com` soft target &lt; 90s. GCP: GCE/Cloud Shell s `dig`, alebo mock bez dig.  
+**22/10 rule:** každý prompt končí zelenými testami + docs + flags (`.env.example`).
 
-UI changelog: [tests/fixtures/schrodinger/CHANGELOG-UI.md](tests/fixtures/schrodinger/CHANGELOG-UI.md). Lab: [docs/LAB-WORKFLOW.md](docs/LAB-WORKFLOW.md#schrödinger-p1).
+UI changelog: [tests/fixtures/schrodinger/CHANGELOG-UI.md](tests/fixtures/schrodinger/CHANGELOG-UI.md). Lab: [docs/LAB-WORKFLOW.md](docs/LAB-WORKFLOW.md#schrödinger-p1). P0: [docs/SCHRODINGER-20-P0.md](docs/SCHRODINGER-20-P0.md). API: [docs/SCHRODINGER-API-DRAFT.md](docs/SCHRODINGER-API-DRAFT.md).
 
 > Attack surface nie je snapshot, je sediment. Palimpsest pridáva čas ako 4. uhol pozorovania — bez API kľúča, čisto cez verejné Wayback CDX.
 

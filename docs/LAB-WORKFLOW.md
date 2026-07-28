@@ -33,18 +33,29 @@ Otvor http://127.0.0.1:5173 a prihlás sa tokenom z `.env`.
 
 ## Schrödinger P1
 
-### Env flags
+### FEATURE_* flags (`GET /api/schrodinger/flags`)
+
+| Flag | Env | Default | Význam |
+|------|-----|---------|--------|
+| `schrodinger.guardrails` | `FEATURE_schrodinger_guardrails` | `true` | Allowlist + SSRF + concurrency |
+| `schrodinger.persist.postgres` | `FEATURE_schrodinger_persist_postgres` | `false` | Postgres store (stub) |
+| `schrodinger.v2_providers` | `FEATURE_schrodinger_v2_providers` | `true` | Dig/Mock multi-record DNS; `false` → force mock |
+
+### Env flags (runtime)
 
 | Premenná | Default | Význam |
 |----------|---------|--------|
 | `SCHRODINGER_SCAN_MODE` | `live` | `mock` = celý scan z fixtures (CI/demo) |
 | `SCHRODINGER_DNS_MODE` | `auto` | `auto` \| `dig` \| `mock` |
-| `SCHRODINGER_ALLOWLIST` | `*` | domény oddelené čiarkou, alebo `*` |
-| `SCHRODINGER_VANTAGES` | `dns,ua,netweb,time` | feature flags per vantage |
+| `SCHRODINGER_ALLOWLIST` | `*` | canonical allowlist (`*` / domény / `*.suffix`) |
+| `SCHRODINGER_TARGET_ALLOWLIST` | — | alias pre `SCHRODINGER_ALLOWLIST` |
+| `SCHRODINGER_VANTAGES` | `dns,ua,netweb,time` | per-vantage on/off |
 | `SCHRODINGER_PORT_PROFILE` | `quick` | `quick` \| `web` |
 | `SCHRODINGER_DOH` | off | `1` = DoH 2. názor (nie namiesto dig) |
 | `SCHRODINGER_DNS_SAMPLE` | `30` | počet resolverov |
 | `SCHRODINGER_DNS_CONCURRENCY` | `6` | parallel dig pool |
+| `SCHRODINGER_MAX_CONCURRENT` | `3` | max paralelné scany |
+| `SCHRODINGER_SCAN_START_DELAY_MS` | `0` | test-only cancel window (CI mock) |
 
 ### DNS providery
 
@@ -92,6 +103,9 @@ Pozri [tests/fixtures/schrodinger/CHANGELOG-UI.md](../tests/fixtures/schrodinger
 
 ## Súvisiace docs
 
+- [Schrödinger P0 architecture](SCHRODINGER-20-P0.md)
+- [Schrödinger API draft](SCHRODINGER-API-DRAFT.md)
+- [UI changelog (P1)](../tests/fixtures/schrodinger/CHANGELOG-UI.md)
 - [Demo script](DEMO-SCRIPT.md) — 3-min prezentácia
 - [Screenshot guide](SCREENSHOTS.md) — Devpost assets
 - [Devpost copy](DEVPOST.md) — submission text

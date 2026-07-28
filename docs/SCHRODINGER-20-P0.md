@@ -55,7 +55,7 @@ P0 transforms the Schrödinger MVP scanner into a production-grade **Observation
 │  └──────────────┘  └──────────────┘  └──────────────┘           │
 └─────────────────────────────────────────────────────────────────┘
 
-Feature Flags: schrodinger.guardrails (ON) · persist.postgres (OFF) · v2_providers (OFF)
+Feature Flags: schrodinger.guardrails (ON) · persist.postgres (OFF) · v2_providers (ON — Dig/Mock P1)
 ```
 
 ## ERD (Entity Relationship Diagram)
@@ -117,7 +117,7 @@ Feature Flags: schrodinger.guardrails (ON) · persist.postgres (OFF) · v2_provi
 
 ### Target Allowlist
 - **Threat**: Unrestricted scanning of arbitrary domains could be abused.
-- **Mitigation**: Configurable allowlist (`SCHRODINGER_ALLOWLIST`). Default `*` for lab use. Glob support (`*.example.com`). Feature-flag gated.
+- **Mitigation**: Configurable allowlist (`SCHRODINGER_ALLOWLIST`, alias `SCHRODINGER_TARGET_ALLOWLIST`). Default `*` for lab use. Glob support (`*.example.com`). Feature-flag gated (`FEATURE_schrodinger_guardrails`).
 
 ### Concurrency Exhaustion
 - **Threat**: Many simultaneous scans could exhaust server resources.

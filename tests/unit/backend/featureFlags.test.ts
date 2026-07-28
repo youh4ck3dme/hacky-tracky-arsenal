@@ -22,9 +22,9 @@ describe('featureFlags', () => {
       expect(isEnabled('schrodinger.persist.postgres')).toBe(false);
     });
 
-    it('schrodinger.v2_providers defaults to false', () => {
+    it('schrodinger.v2_providers defaults to true (P1 Dig/Mock shipped)', () => {
       delete process.env.FEATURE_schrodinger_v2_providers;
-      expect(isEnabled('schrodinger.v2_providers')).toBe(false);
+      expect(isEnabled('schrodinger.v2_providers')).toBe(true);
     });
   });
 

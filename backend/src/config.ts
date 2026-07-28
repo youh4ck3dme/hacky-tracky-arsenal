@@ -41,9 +41,13 @@ export const config = {
     maxConcurrent: Number(process.env.SCHRODINGER_MAX_CONCURRENT ?? 3),
     /**
      * Target allowlist — comma-separated domains or globs.
+     * Canonical env: SCHRODINGER_ALLOWLIST (alias: SCHRODINGER_TARGET_ALLOWLIST).
      * `*` = allow all (default). Example: `*.example.com,test.org`
      */
-    targetAllowlist: process.env.SCHRODINGER_TARGET_ALLOWLIST ?? '*',
+    targetAllowlist:
+      process.env.SCHRODINGER_ALLOWLIST ??
+      process.env.SCHRODINGER_TARGET_ALLOWLIST ??
+      '*',
     /** Path to JSON file for optional disk persistence. Empty = in-memory only. */
     storeFile: process.env.SCHRODINGER_STORE_FILE ?? '',
     /** Max audit log entries in ring buffer. */

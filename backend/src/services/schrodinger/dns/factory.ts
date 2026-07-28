@@ -1,4 +1,5 @@
 import type { DnsMode } from '../../../types/schrodinger.js';
+import { isEnabled } from '../../../schrodinger/featureFlags.js';
 import { DigDnsProvider, isDigAvailable } from './digProvider.js';
 import { MockDnsProvider } from './mockProvider.js';
 import type { DnsProvider } from './types.js';
@@ -7,6 +8,14 @@ export async function createDnsProvider(
   mode: DnsMode,
 ): Promise<{ provider: DnsProvider; notices: string[] }> {
   const notices: string[] = [];
+
+  // FEATURE_schrodinger_v2_providers=false → force mock (emergency rollback)
+  if (!isEnabled('schrodinger.v2_providers') && mode !== 'mock') {
+    notices.push(
+      'FEATURE_schrodinger_v2_providers=false — DNS vynútený na MockDnsProvider.',
+    );
+    return { provider: new MockDnsProvider(), notices };
+  }
 
   if (mode === 'mock') {
     return { provider: new MockDnsProvider(), notices };

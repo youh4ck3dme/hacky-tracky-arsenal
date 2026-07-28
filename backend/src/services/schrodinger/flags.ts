@@ -46,7 +46,11 @@ export function loadSchrodingerFlags(arsenalRoot: string): SchrodingerFlags {
   const profileRaw = (process.env.SCHRODINGER_PORT_PROFILE ?? 'quick').toLowerCase();
   const portProfile: PortProfile = profileRaw === 'web' ? 'web' : 'quick';
 
-  const allowRaw = process.env.SCHRODINGER_ALLOWLIST ?? '*';
+  // Canonical: SCHRODINGER_ALLOWLIST; alias: SCHRODINGER_TARGET_ALLOWLIST (P0 docs)
+  const allowRaw =
+    process.env.SCHRODINGER_ALLOWLIST ??
+    process.env.SCHRODINGER_TARGET_ALLOWLIST ??
+    '*';
   const allowAllDomains = allowRaw.trim() === '*';
   const allowlist = allowAllDomains
     ? []

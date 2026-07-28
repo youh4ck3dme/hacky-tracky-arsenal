@@ -10,8 +10,11 @@ const DEFAULTS = {
   'schrodinger.guardrails': true,
   /** P1: Enable Postgres persistence. Default OFF — uses memory/file. */
   'schrodinger.persist.postgres': false,
-  /** P1: Enable v2 provider system (multi-record DNS, etc). Default OFF. */
-  'schrodinger.v2_providers': false,
+  /**
+   * P1: DigDnsProvider + MockDnsProvider multi-record stack (already shipped).
+   * Default ON. Set false only for emergency rollback experiments.
+   */
+  'schrodinger.v2_providers': true,
 } as const;
 
 export type FeatureFlagName = keyof typeof DEFAULTS;
