@@ -82,7 +82,11 @@ class SchrodingerScannerService {
       for (const f of scan.matrix) {
         listener('finding', f);
       }
-      if (scan.status === 'completed' || scan.status === 'failed') {
+      if (
+        scan.status === 'completed' ||
+        scan.status === 'failed' ||
+        scan.status === 'cancelled'
+      ) {
         listener('done', {
           status: scan.status,
           error: scan.error,
@@ -170,7 +174,16 @@ class SchrodingerScannerService {
     const abortController = new AbortController();
     this.abortControllers.set(scan.id, abortController);
 
-    void this.runScan(scan.id, abortController.signal, releaseConcurrency);
+    // Optional start delay (tests set SCHRODINGER_SCAN_START_DELAY_MS so DELETE
+    // can land while status is still running — mock scans otherwise finish in <1ms).
+    const startDelayMs = Number(process.env.SCHRODINGER_SCAN_START_DELAY_MS ?? 0);
+    if (startDelayMs > 0) {
+      setTimeout(() => {
+        void this.runScan(scan.id, abortController.signal, releaseConcurrency!);
+      }, startDelayMs);
+    } else {
+      void this.runScan(scan.id, abortController.signal, releaseConcurrency);
+    }
     return scan;
   }
 
@@ -211,6 +224,10 @@ class SchrodingerScannerService {
     return scan;
   }
 
+  private isTerminal(status: SchrodingerScan['status']): boolean {
+    return status === 'completed' || status === 'failed' || status === 'cancelled';
+  }
+
   private async runScan(
     scanId: string,
     signal: AbortSignal,
@@ -218,6 +235,12 @@ class SchrodingerScannerService {
   ): Promise<void> {
     const scan = this.store.get(scanId);
     if (!scan) { releaseConcurrency(); return; }
+
+    // cancelScan may have finalized before work starts
+    if (this.isTerminal(scan.status)) {
+      releaseConcurrency();
+      return;
+    }
 
     if (scan.status !== 'running') {
       scan.status = 'running';
@@ -229,7 +252,9 @@ class SchrodingerScannerService {
     let resolvedIps: string[] = [];
 
     try {
-      if (signal.aborted) throw new Error('Scan cancelled');
+      if (signal.aborted || scan.status === 'cancelled') {
+        throw new Error('Scan cancelled');
+      }
 
       if (isVantageEnabled(this.flags, 'dns')) {
         const dns = await this.scanDns(scan.target, scanId, notices);
@@ -313,6 +338,14 @@ class SchrodingerScannerService {
         this.emit(scanId, 'finding', finding);
       }
 
+      // cancelScan may have won the race — never clobber terminal cancelled/failed
+      if (this.isTerminal(scan.status) || signal.aborted) {
+        if (scan.status === 'cancelled' || signal.aborted) {
+          this.finalizeCancelled(scan, scanId, notices);
+        }
+        return;
+      }
+
       scan.notices = notices;
       scan.status = 'completed';
       scan.finishedAt = new Date().toISOString();
@@ -336,9 +369,22 @@ class SchrodingerScannerService {
         vantages: scan.vantages.length,
       }, { target: scan.target, scanId });
     } catch (err) {
+      // cancelScan already set cancelled + emitted done — do not overwrite
+      if (scan.status === 'cancelled') {
+        return;
+      }
+
+      const msg = err instanceof Error ? err.message : 'Scan failed';
+      const wasCancel =
+        signal.aborted || /cancelled/i.test(msg);
+
+      if (wasCancel) {
+        this.finalizeCancelled(scan, scanId, notices);
+        return;
+      }
 
       scan.status = 'failed';
-      scan.error = err instanceof Error ? err.message : 'Scan failed';
+      scan.error = msg;
       scan.notices = notices;
       scan.finishedAt = new Date().toISOString();
       this.save(scan);
@@ -357,6 +403,33 @@ class SchrodingerScannerService {
       this.abortControllers.delete(scanId);
       releaseConcurrency();
     }
+  }
+
+  /** Idempotent cancel finalization (cancelScan and abort path share this). */
+  private finalizeCancelled(
+    scan: SchrodingerScan,
+    scanId: string,
+    notices: string[],
+  ): void {
+    if (scan.status === 'cancelled' && scan.finishedAt) {
+      // cancelScan already persisted + emitted
+      return;
+    }
+    scan.status = 'cancelled';
+    scan.error = scan.error ?? 'Scan cancelled by user';
+    scan.notices = notices.length > 0 ? notices : scan.notices;
+    scan.finishedAt = scan.finishedAt ?? new Date().toISOString();
+    this.save(scan);
+    this.emit(scanId, 'done', {
+      status: 'cancelled',
+      error: scan.error,
+      risk_score: null,
+      notices: scan.notices,
+    });
+    getAuditLog().append('scan.cancelled', 'system', { scanId }, {
+      target: scan.target,
+      scanId,
+    });
   }
 
   private async scanDns(

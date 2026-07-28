@@ -24,3 +24,5 @@ process.env.HOST ??= '127.0.0.1';
 process.env.SCHRODINGER_SCAN_MODE ??= 'mock';
 process.env.SCHRODINGER_DNS_MODE ??= 'mock';
 process.env.SCHRODINGER_ALLOWLIST ??= '*';
+// Give DELETE /scans/:id a window before mock runScan starts (race with <1ms mock)
+process.env.SCHRODINGER_SCAN_START_DELAY_MS ??= '40';
