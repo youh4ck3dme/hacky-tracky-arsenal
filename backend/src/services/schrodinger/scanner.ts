@@ -252,7 +252,7 @@ class SchrodingerScannerService {
     let resolvedIps: string[] = [];
 
     try {
-      if (signal.aborted || scan.status === 'cancelled') {
+      if (signal.aborted || (scan.status as string) === 'cancelled') {
         throw new Error('Scan cancelled');
       }
 
@@ -340,7 +340,7 @@ class SchrodingerScannerService {
 
       // cancelScan may have won the race — never clobber terminal cancelled/failed
       if (this.isTerminal(scan.status) || signal.aborted) {
-        if (scan.status === 'cancelled' || signal.aborted) {
+        if ((scan.status as string) === 'cancelled' || signal.aborted) {
           this.finalizeCancelled(scan, scanId, notices);
         }
         return;
@@ -370,7 +370,7 @@ class SchrodingerScannerService {
       }, { target: scan.target, scanId });
     } catch (err) {
       // cancelScan already set cancelled + emitted done — do not overwrite
-      if (scan.status === 'cancelled') {
+      if ((scan.status as string) === 'cancelled') {
         return;
       }
 
