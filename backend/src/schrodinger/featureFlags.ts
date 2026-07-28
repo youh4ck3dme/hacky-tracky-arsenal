@@ -15,6 +15,16 @@ const DEFAULTS = {
    * Default ON. Set false only for emergency rollback experiments.
    */
   'schrodinger.v2_providers': true,
+  /** P2: Background target watching & push notifications. Default OFF. */
+  'schrodinger.watch': false,
+  /** P2: Tool Bridge — suggest Arsenal tools per finding. Default ON. */
+  'schrodinger.tool_bridge': true,
+  /** P3: Vertex AI Gemini triage integration. Default OFF. */
+  'schrodinger.vertex_triage': false,
+  /** P3: Multi-region egress probe. Default OFF. */
+  'schrodinger.multi_region': false,
+  /** P3: BigQuery telemetry sink. Default OFF. */
+  'schrodinger.bigquery_sink': false,
 } as const;
 
 export type FeatureFlagName = keyof typeof DEFAULTS;

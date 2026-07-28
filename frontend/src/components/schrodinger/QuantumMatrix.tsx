@@ -76,6 +76,19 @@ export function QuantumMatrix({ findings, riskScore }: QuantumMatrixProps) {
                 ))}
               </ul>
             )}
+            <div className="mt-2 flex items-center justify-between pt-1 border-t border-slate-800/60">
+              <span className="text-[10px] text-slate-500">Suggested tool:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const toolName = f.id.includes('dns') ? 'dig' : f.id.includes('net') ? 'nmap' : 'curl';
+                  alert(`[Arsenal Tool Bridge] Draft Job Context: Prep server parameter for ${toolName}`);
+                }}
+                className="inline-flex items-center gap-1 rounded bg-violet-500/10 px-2 py-0.5 text-[10px] font-medium text-violet-300 border border-violet-500/30 hover:bg-violet-500/20 transition-colors"
+              >
+                🛠️ {f.id.includes('dns') ? 'dig' : f.id.includes('net') ? 'nmap' : 'curl'}
+              </button>
+            </div>
           </div>
         ))}
       </div>

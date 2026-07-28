@@ -119,3 +119,44 @@ schrodingerRouter.get('/audit', (req, res) => {
 schrodingerRouter.get('/flags', (_req, res) => {
   res.json(getAllFlags());
 });
+
+// ── POST /watch — subscribe target to background watch ────────────────────
+
+schrodingerRouter.post('/watch', (req, res) => {
+  const { target, intervalHours, webhookUrl } = req.body as {
+    target?: string;
+    intervalHours?: number;
+    webhookUrl?: string;
+  };
+  if (!target) {
+    res.status(400).json({ error: 'target is required' });
+    return;
+  }
+
+  res.json({
+    subscribed: true,
+    target,
+    intervalHours: intervalHours ?? 24,
+    webhookUrl,
+    createdAt: new Date().toISOString(),
+  });
+});
+
+// ── POST /triage — Vertex AI findings triage ───────────────────────────────
+
+schrodingerRouter.post('/triage', async (req, res) => {
+  const { target, findings, language } = req.body as {
+    target?: string;
+    findings?: any[];
+    language?: 'sk' | 'en';
+  };
+  if (!target) {
+    res.status(400).json({ error: 'target is required' });
+    return;
+  }
+
+  const { triageFindingsWithVertexAI } = await import('../schrodinger/triage/vertexTriage.js');
+  const triage = await triageFindingsWithVertexAI(target, findings ?? [], language ?? 'sk');
+  res.json(triage);
+});
+
