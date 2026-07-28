@@ -1,192 +1,139 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "modules": [
     {
       "id": "exploit",
       "name": "Exploit Tools",
-      "description": "PEASS-ng, LinEnum, Impacket",
+      "description": "PEASS · Impacket · ✨ Certipy (AD CS)",
       "script": "exploit-tools.sh",
       "icon": "shield",
-      "toolIds": ["peass-ng", "linenum", "impacket"]
+      "toolIds": ["peass-ng", "linenum", "impacket", "certipy"]
     },
     {
       "id": "web",
       "name": "Web Hacking",
-      "description": "SecLists, nuclei, ffuf",
+      "description": "SecLists · nuclei · ✨ smuggler · XSStrike",
       "script": "web-hacking.sh",
       "icon": "globe",
-      "toolIds": ["seclists", "nuclei", "ffuf"]
+      "toolIds": ["seclists", "nuclei", "ffuf", "smuggler", "xsstrike"]
     },
     {
       "id": "network",
       "name": "Network Tools",
-      "description": "masscan, bettercap, nmap",
+      "description": "masscan · nmap · ✨ chisel · NetExec",
       "script": "network-tools.sh",
       "icon": "network",
-      "toolIds": ["masscan", "bettercap", "nmap"]
+      "toolIds": ["masscan", "bettercap", "nmap", "chisel", "netexec"]
     },
     {
       "id": "malware",
       "name": "Malware & Analysis",
-      "description": "theZoo, gitleaks, trivy",
+      "description": "theZoo · gitleaks · ✨ capa · FLOSS",
       "script": "malware-tools.sh",
       "icon": "bug",
-      "toolIds": ["thezoo", "gitleaks", "trivy"]
+      "toolIds": ["thezoo", "gitleaks", "trivy", "capa", "flare-floss"]
     },
     {
       "id": "ai",
       "name": "AI / OSINT Tools",
-      "description": "sherlock, theHarvester, amass, resolvers",
+      "description": "sherlock · amass · ✨ garak · SpiderFoot",
       "script": "ai-tools.sh",
       "icon": "brain",
-      "toolIds": ["sherlock", "theharvester", "amass", "resolvers"]
+      "toolIds": ["sherlock", "theharvester", "amass", "resolvers", "garak", "spiderfoot"]
     },
     {
       "id": "full",
       "name": "Full Install",
-      "description": "Spusti všetky moduly (best public stack)",
+      "description": "Všetky moduly + WOW stack",
       "script": "full-install.sh",
       "icon": "rocket",
       "toolIds": [
-        "peass-ng", "linenum", "impacket",
-        "seclists", "nuclei", "ffuf",
-        "masscan", "bettercap", "nmap",
-        "thezoo", "gitleaks", "trivy",
-        "sherlock", "theharvester", "amass", "resolvers"
+        "peass-ng", "linenum", "impacket", "certipy",
+        "seclists", "nuclei", "ffuf", "smuggler", "xsstrike",
+        "masscan", "bettercap", "nmap", "chisel", "netexec",
+        "thezoo", "gitleaks", "trivy", "capa", "flare-floss",
+        "sherlock", "theharvester", "amass", "resolvers", "garak", "spiderfoot"
       ]
     }
   ],
   "tools": [
+    { "id": "peass-ng", "name": "PEASS-ng", "repoDir": "PEASS-ng", "category": "exploit" },
+    { "id": "linenum", "name": "LinEnum", "repoDir": "LinEnum", "category": "exploit" },
+    { "id": "impacket", "name": "Impacket", "repoDir": "impacket", "category": "exploit" },
     {
-      "id": "peass-ng",
-      "name": "PEASS-ng",
-      "repoDir": "PEASS-ng",
+      "id": "certipy",
+      "name": "Certipy ✨",
+      "repoDir": "Certipy",
       "category": "exploit"
     },
+    { "id": "seclists", "name": "SecLists", "repoDir": "SecLists", "category": "web" },
+    { "id": "nuclei", "name": "nuclei", "repoDir": "nuclei", "category": "web" },
+    { "id": "ffuf", "name": "ffuf", "repoDir": "ffuf", "category": "web" },
     {
-      "id": "linenum",
-      "name": "LinEnum",
-      "repoDir": "LinEnum",
-      "category": "exploit"
-    },
-    {
-      "id": "impacket",
-      "name": "Impacket",
-      "repoDir": "impacket",
-      "category": "exploit"
-    },
-    {
-      "id": "seclists",
-      "name": "SecLists",
-      "repoDir": "SecLists",
+      "id": "smuggler",
+      "name": "smuggler ✨",
+      "repoDir": "smuggler",
       "category": "web"
     },
     {
-      "id": "nuclei",
-      "name": "nuclei",
-      "repoDir": "nuclei",
+      "id": "xsstrike",
+      "name": "XSStrike ✨",
+      "repoDir": "XSStrike",
       "category": "web"
     },
+    { "id": "sqlmap", "name": "sqlmap", "repoDir": "sqlmap", "category": "web", "optional": true },
+    { "id": "wafw00f", "name": "wafw00f", "repoDir": "wafw00f", "category": "web", "optional": true },
+    { "id": "masscan", "name": "masscan", "repoDir": "masscan", "category": "network" },
+    { "id": "bettercap", "name": "bettercap", "repoDir": "bettercap", "category": "network" },
+    { "id": "nmap", "name": "nmap", "repoDir": "nmap", "category": "network" },
     {
-      "id": "ffuf",
-      "name": "ffuf",
-      "repoDir": "ffuf",
-      "category": "web"
-    },
-    {
-      "id": "sqlmap",
-      "name": "sqlmap",
-      "repoDir": "sqlmap",
-      "category": "web",
-      "optional": true
-    },
-    {
-      "id": "wpscan",
-      "name": "WPScan",
-      "repoDir": "wpscan",
-      "category": "web",
-      "optional": true
-    },
-    {
-      "id": "masscan",
-      "name": "masscan",
-      "repoDir": "masscan",
+      "id": "chisel",
+      "name": "chisel ✨",
+      "repoDir": "chisel",
       "category": "network"
     },
     {
-      "id": "bettercap",
-      "name": "bettercap",
-      "repoDir": "bettercap",
+      "id": "netexec",
+      "name": "NetExec ✨",
+      "repoDir": "NetExec",
       "category": "network"
     },
+    { "id": "zmap", "name": "zmap", "repoDir": "zmap", "category": "network", "optional": true },
+    { "id": "httpx", "name": "httpx", "repoDir": "httpx", "category": "network", "optional": true },
+    { "id": "coercer", "name": "Coercer", "repoDir": "Coercer", "category": "network", "optional": true },
+    { "id": "thezoo", "name": "theZoo", "repoDir": "theZoo", "category": "malware" },
+    { "id": "gitleaks", "name": "gitleaks", "repoDir": "gitleaks", "category": "malware" },
+    { "id": "trivy", "name": "trivy", "repoDir": "trivy", "category": "malware" },
     {
-      "id": "nmap",
-      "name": "nmap",
-      "repoDir": "nmap",
-      "category": "network"
-    },
-    {
-      "id": "zmap",
-      "name": "zmap",
-      "repoDir": "zmap",
-      "category": "network",
-      "optional": true
-    },
-    {
-      "id": "httpx",
-      "name": "httpx",
-      "repoDir": "httpx",
-      "category": "network",
-      "optional": true
-    },
-    {
-      "id": "thezoo",
-      "name": "theZoo",
-      "repoDir": "theZoo",
+      "id": "capa",
+      "name": "capa ✨",
+      "repoDir": "capa",
       "category": "malware"
     },
     {
-      "id": "gitleaks",
-      "name": "gitleaks",
-      "repoDir": "gitleaks",
+      "id": "flare-floss",
+      "name": "FLOSS ✨",
+      "repoDir": "flare-floss",
       "category": "malware"
     },
+    { "id": "yara", "name": "YARA", "repoDir": "yara", "category": "malware", "optional": true },
+    { "id": "sherlock", "name": "Sherlock", "repoDir": "sherlock", "category": "ai" },
+    { "id": "theharvester", "name": "theHarvester", "repoDir": "theHarvester", "category": "ai" },
+    { "id": "amass", "name": "Amass", "repoDir": "amass", "category": "ai" },
+    { "id": "resolvers", "name": "resolvers", "repoDir": "resolvers", "category": "ai" },
     {
-      "id": "trivy",
-      "name": "trivy",
-      "repoDir": "trivy",
-      "category": "malware"
-    },
-    {
-      "id": "sherlock",
-      "name": "Sherlock",
-      "repoDir": "sherlock",
+      "id": "garak",
+      "name": "garak ✨",
+      "repoDir": "garak",
       "category": "ai"
     },
     {
-      "id": "theharvester",
-      "name": "theHarvester",
-      "repoDir": "theHarvester",
+      "id": "spiderfoot",
+      "name": "SpiderFoot ✨",
+      "repoDir": "spiderfoot",
       "category": "ai"
     },
-    {
-      "id": "amass",
-      "name": "Amass",
-      "repoDir": "amass",
-      "category": "ai"
-    },
-    {
-      "id": "resolvers",
-      "name": "resolvers",
-      "repoDir": "resolvers",
-      "category": "ai"
-    },
-    {
-      "id": "pywhat",
-      "name": "pyWhat",
-      "repoDir": "pyWhat",
-      "category": "ai",
-      "optional": true
-    }
+    { "id": "pywhat", "name": "pyWhat", "repoDir": "pyWhat", "category": "ai", "optional": true },
+    { "id": "ghunt", "name": "GHunt", "repoDir": "GHunt", "category": "ai", "optional": true }
   ]
 }

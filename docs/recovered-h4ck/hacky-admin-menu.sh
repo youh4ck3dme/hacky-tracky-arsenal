@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# HACKY TRACKY ADMIN PANEL — best public GitHub stack (2026)
+# HACKY TRACKY — best public stack + WOW tools per category
 set -euo pipefail
 H4CK_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$H4CK_ROOT"
 
 banner() {
   cat <<'B'
-╔══════════════════════════════════════════════╗
-║  HACKY TRACKY — Best Public Arsenal Stack    ║
-╚══════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════╗
+║  HACKY TRACKY — Best Public + ✨ WOW stack           ║
+║  Certipy · smuggler · chisel · capa · garak          ║
+╚══════════════════════════════════════════════════════╝
 B
 }
 
@@ -23,11 +24,11 @@ fi
 banner
 PS3=$'\nVyber modul: '
 options=(
-  "Exploit (PEASS + LinEnum + Impacket)"
-  "Web (SecLists + nuclei + ffuf)"
-  "Network (masscan + bettercap + nmap)"
-  "Analysis (theZoo + gitleaks + trivy)"
-  "OSINT (sherlock + theHarvester + amass)"
+  "Exploit + ✨ Certipy (AD CS)"
+  "Web + ✨ smuggler / XSStrike"
+  "Network + ✨ chisel / NetExec"
+  "Analysis + ✨ capa / FLOSS"
+  "OSINT/AI + ✨ garak / SpiderFoot"
   "Full install"
   "Quit"
 )
