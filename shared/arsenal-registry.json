@@ -1,156 +1,139 @@
 {
-  "version": "1.0.0",
+  "version": "2.1.0",
   "modules": [
     {
       "id": "exploit",
       "name": "Exploit Tools",
-      "description": "Kali, LinEnum, PEASS",
+      "description": "PEASS · Impacket · ✨ Certipy (AD CS)",
       "script": "exploit-tools.sh",
       "icon": "shield",
-      "toolIds": ["exploitdb", "linenum", "peass-ng"]
+      "toolIds": ["peass-ng", "linenum", "impacket", "certipy"]
     },
     {
       "id": "web",
       "name": "Web Hacking",
-      "description": "SecLists, WP Exploits, WPScan",
+      "description": "SecLists · nuclei · ✨ smuggler · XSStrike",
       "script": "web-hacking.sh",
       "icon": "globe",
-      "toolIds": ["seclists", "wordpress-exploit-framework", "wpscan"]
+      "toolIds": ["seclists", "nuclei", "ffuf", "smuggler", "xsstrike"]
     },
     {
       "id": "network",
       "name": "Network Tools",
-      "description": "masscan, zmap, bettercap",
+      "description": "masscan · nmap · ✨ chisel · NetExec",
       "script": "network-tools.sh",
       "icon": "network",
-      "toolIds": ["masscan", "zmap", "bettercap"]
+      "toolIds": ["masscan", "bettercap", "nmap", "chisel", "netexec"]
     },
     {
       "id": "malware",
-      "name": "Malware & Phishing",
-      "description": "zphisher, theZoo, CredHarvester",
+      "name": "Malware & Analysis",
+      "description": "theZoo · gitleaks · ✨ capa · FLOSS",
       "script": "malware-tools.sh",
       "icon": "bug",
-      "toolIds": ["thezoo", "credential-harvester", "zphisher"]
+      "toolIds": ["thezoo", "gitleaks", "trivy", "capa", "flare-floss"]
     },
     {
       "id": "ai",
       "name": "AI / OSINT Tools",
-      "description": "AI-Hacking, resolvers, pyWhat",
+      "description": "sherlock · amass · ✨ garak · SpiderFoot",
       "script": "ai-tools.sh",
       "icon": "brain",
-      "toolIds": ["resolvers", "pywhat", "ai-hacking-tools"]
+      "toolIds": ["sherlock", "theharvester", "amass", "resolvers", "garak", "spiderfoot"]
     },
     {
       "id": "full",
       "name": "Full Install",
-      "description": "Spusti všetky moduly",
+      "description": "Všetky moduly + WOW stack",
       "script": "full-install.sh",
       "icon": "rocket",
       "toolIds": [
-        "exploitdb", "linenum", "peass-ng",
-        "seclists", "wordpress-exploit-framework", "wpscan",
-        "masscan", "zmap", "bettercap",
-        "thezoo", "credential-harvester", "zphisher",
-        "resolvers", "pywhat", "ai-hacking-tools"
+        "peass-ng", "linenum", "impacket", "certipy",
+        "seclists", "nuclei", "ffuf", "smuggler", "xsstrike",
+        "masscan", "bettercap", "nmap", "chisel", "netexec",
+        "thezoo", "gitleaks", "trivy", "capa", "flare-floss",
+        "sherlock", "theharvester", "amass", "resolvers", "garak", "spiderfoot"
       ]
     }
   ],
   "tools": [
+    { "id": "peass-ng", "name": "PEASS-ng", "repoDir": "PEASS-ng", "category": "exploit" },
+    { "id": "linenum", "name": "LinEnum", "repoDir": "LinEnum", "category": "exploit" },
+    { "id": "impacket", "name": "Impacket", "repoDir": "impacket", "category": "exploit" },
     {
-      "id": "exploitdb",
-      "name": "ExploitDB",
-      "repoDir": "exploitdb",
+      "id": "certipy",
+      "name": "Certipy ✨",
+      "repoDir": "Certipy",
       "category": "exploit"
     },
+    { "id": "seclists", "name": "SecLists", "repoDir": "SecLists", "category": "web" },
+    { "id": "nuclei", "name": "nuclei", "repoDir": "nuclei", "category": "web" },
+    { "id": "ffuf", "name": "ffuf", "repoDir": "ffuf", "category": "web" },
     {
-      "id": "linenum",
-      "name": "LinEnum",
-      "repoDir": "LinEnum",
-      "category": "exploit"
-    },
-    {
-      "id": "peass-ng",
-      "name": "PEASS-ng",
-      "repoDir": "PEASS-ng",
-      "category": "exploit"
-    },
-    {
-      "id": "seclists",
-      "name": "SecLists",
-      "repoDir": "SecLists",
+      "id": "smuggler",
+      "name": "smuggler ✨",
+      "repoDir": "smuggler",
       "category": "web"
     },
     {
-      "id": "wordpress-exploit-framework",
-      "name": "Wordpress Exploit Framework",
-      "repoDir": "Wordpress-Exploit-Framework",
-      "category": "web",
-      "optional": true
+      "id": "xsstrike",
+      "name": "XSStrike ✨",
+      "repoDir": "XSStrike",
+      "category": "web"
     },
+    { "id": "sqlmap", "name": "sqlmap", "repoDir": "sqlmap", "category": "web", "optional": true },
+    { "id": "wafw00f", "name": "wafw00f", "repoDir": "wafw00f", "category": "web", "optional": true },
+    { "id": "masscan", "name": "masscan", "repoDir": "masscan", "category": "network" },
+    { "id": "bettercap", "name": "bettercap", "repoDir": "bettercap", "category": "network" },
+    { "id": "nmap", "name": "nmap", "repoDir": "nmap", "category": "network" },
     {
-      "id": "wpscan",
-      "name": "WPScan",
-      "repoDir": "wpscan",
-      "category": "web",
-      "healthCheck": {
-        "type": "fileExists",
-        "paths": ["wpscan/lib/wpscan.rb", "wpscan/bin/wpscan"]
-      }
-    },
-    {
-      "id": "masscan",
-      "name": "masscan",
-      "repoDir": "masscan",
+      "id": "chisel",
+      "name": "chisel ✨",
+      "repoDir": "chisel",
       "category": "network"
     },
     {
-      "id": "zmap",
-      "name": "zmap",
-      "repoDir": "zmap",
+      "id": "netexec",
+      "name": "NetExec ✨",
+      "repoDir": "NetExec",
       "category": "network"
     },
+    { "id": "zmap", "name": "zmap", "repoDir": "zmap", "category": "network", "optional": true },
+    { "id": "httpx", "name": "httpx", "repoDir": "httpx", "category": "network", "optional": true },
+    { "id": "coercer", "name": "Coercer", "repoDir": "Coercer", "category": "network", "optional": true },
+    { "id": "thezoo", "name": "theZoo", "repoDir": "theZoo", "category": "malware" },
+    { "id": "gitleaks", "name": "gitleaks", "repoDir": "gitleaks", "category": "malware" },
+    { "id": "trivy", "name": "trivy", "repoDir": "trivy", "category": "malware" },
     {
-      "id": "bettercap",
-      "name": "bettercap",
-      "repoDir": "bettercap",
-      "category": "network"
-    },
-    {
-      "id": "thezoo",
-      "name": "theZoo",
-      "repoDir": "theZoo",
+      "id": "capa",
+      "name": "capa ✨",
+      "repoDir": "capa",
       "category": "malware"
     },
     {
-      "id": "credential-harvester",
-      "name": "Credential Harvester (SET)",
-      "repoDir": "Credential-Harvester",
+      "id": "flare-floss",
+      "name": "FLOSS ✨",
+      "repoDir": "flare-floss",
       "category": "malware"
     },
+    { "id": "yara", "name": "YARA", "repoDir": "yara", "category": "malware", "optional": true },
+    { "id": "sherlock", "name": "Sherlock", "repoDir": "sherlock", "category": "ai" },
+    { "id": "theharvester", "name": "theHarvester", "repoDir": "theHarvester", "category": "ai" },
+    { "id": "amass", "name": "Amass", "repoDir": "amass", "category": "ai" },
+    { "id": "resolvers", "name": "resolvers", "repoDir": "resolvers", "category": "ai" },
     {
-      "id": "zphisher",
-      "name": "zphisher",
-      "repoDir": "zphisher",
-      "category": "malware"
-    },
-    {
-      "id": "resolvers",
-      "name": "resolvers",
-      "repoDir": "resolvers",
+      "id": "garak",
+      "name": "garak ✨",
+      "repoDir": "garak",
       "category": "ai"
     },
     {
-      "id": "pywhat",
-      "name": "pyWhat",
-      "repoDir": "pyWhat",
+      "id": "spiderfoot",
+      "name": "SpiderFoot ✨",
+      "repoDir": "spiderfoot",
       "category": "ai"
     },
-    {
-      "id": "ai-hacking-tools",
-      "name": "AI Hacking Tools",
-      "repoDir": "AI-Hacking-Tools",
-      "category": "ai"
-    }
+    { "id": "pywhat", "name": "pyWhat", "repoDir": "pyWhat", "category": "ai", "optional": true },
+    { "id": "ghunt", "name": "GHunt", "repoDir": "GHunt", "category": "ai", "optional": true }
   ]
 }

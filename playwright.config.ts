@@ -37,7 +37,34 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      // Desktop product E2E (not phone integrity / not dedicated PWA-stability stress)
+      testIgnore: [
+        '**/iphone-17-air-integrity.spec.ts',
+        '**/pwa.spec.ts',
+        '**/stability.spec.ts',
+      ],
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'pwa',
+      testMatch: '**/pwa.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        // PWA needs SW
+        serviceWorkers: 'allow',
+      },
+    },
+    {
+      name: 'stability',
+      testMatch: '**/stability.spec.ts',
+      timeout: 90_000,
+      use: {
+        ...devices['Desktop Chrome'],
+        serviceWorkers: 'allow',
+      },
+    },
     {
       name: 'iphone-17-air',
       testMatch: '**/iphone-17-air-integrity.spec.ts',

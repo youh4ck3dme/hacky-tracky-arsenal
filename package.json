@@ -20,7 +20,11 @@
     "test:browser:report": "playwright show-report",
     "test:iphone17air": "playwright test --project=iphone-17-air tests/e2e/iphone-17-air-integrity.spec.ts",
     "test:iphone17air:headed": "playwright test --project=iphone-17-air tests/e2e/iphone-17-air-integrity.spec.ts --headed",
-    "test:all": "vitest run && ./scripts/smoke-test.sh"
+    "test:pwa": "playwright test --project=pwa",
+    "test:stability": "playwright test --project=stability",
+    "test:pwa-stability": "playwright test --project=pwa --project=stability",
+    "test:all": "vitest run && ./scripts/smoke-test.sh",
+    "test:all:browser": "playwright test --project=chromium --project=pwa --project=stability --project=iphone-17-air"
   },
   "packageManager": "pnpm@11.5.2",
   "devDependencies": {
