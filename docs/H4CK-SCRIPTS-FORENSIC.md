@@ -48,3 +48,28 @@ Only **stubs** (~250 B each) from 2026-07-28 at `/Users/erikbabcan/h4ck/` (not t
 
 ## This branch
 `recover/h4ck-scripts-forensic` — **keep open**; do not delete until scripts are restored.
+
+## Recovery update (2026-07-28 later)
+
+Recovered **real module scripts** (post-refactor with `_arsenal-sync.sh`) from Cursor agent transcript:
+`~/.cursor/projects/Users-erikbabcan-h4ck-unzipped/agent-transcripts/a9172686-...`
+
+| File | Source |
+|------|--------|
+| `_arsenal-sync.sh` | Write tool in transcript |
+| `network-tools.sh` | masscan, zmap, bettercap |
+| `exploit-tools.sh` | exploitdb, LinEnum, PEASS-ng |
+| `web-hacking.sh` | SecLists, wpscan, WEF optional |
+| `malware-tools.sh` | theZoo, SET, zphisher |
+| `ai-tools.sh` | resolvers, pyWhat, AI-Hacking-Tools |
+| `full-install.sh` | runs all modules |
+| `start-lab.sh` | launches arsenal-pwa dev-all |
+| `hacky-admin-menu.sh` | **reconstructed** menu launcher (original body not in transcript Writes; only Read redacted) |
+
+Restored live to: `/Users/erikbabcan/h4ck/`  
+Reference copy in this branch: `docs/recovered-h4ck/`
+
+Set:
+```bash
+export H4CK_ROOT=/Users/erikbabcan/h4ck
+```
