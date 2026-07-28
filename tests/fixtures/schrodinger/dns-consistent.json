@@ -1,0 +1,10 @@
+{
+  "target": "example.com",
+  "description": "Consistent A records across resolvers — collapsed DNS",
+  "expect": {
+    "uniqueASets": 1,
+    "minConsistency": 70,
+    "splitHorizon": false,
+    "states": ["collapsed"]
+  }
+}

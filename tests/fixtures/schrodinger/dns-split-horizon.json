@@ -1,0 +1,10 @@
+{
+  "target": "quantum.example.com",
+  "description": "Split-horizon mock — distinct A sets → quantum",
+  "expect": {
+    "uniqueASets": 2,
+    "maxConsistency": 69,
+    "splitHorizon": true,
+    "findingId": "dns-quantum-split"
+  }
+}

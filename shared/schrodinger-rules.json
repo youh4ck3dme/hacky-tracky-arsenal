@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "dns-split-horizon",
+      "name": "DNS split-horizon",
+      "description": "Different resolvers return distinct A-record sets for the same name.",
+      "match": {
+        "anyFinding": {
+          "vantage": "dns",
+          "idEquals": "dns-quantum-split",
+          "state": "quantum"
+        }
+      },
+      "state": "quantum",
+      "severity": "high",
+      "riskWeight": 35,
+      "next_actions": [
+        "Porovnaj A záznamy naprieč resolvermi",
+        "Skontroluj CDN / geo DNS konfiguráciu",
+        "Over split-horizon (interný vs verejný view)"
+      ]
+    },
+    {
+      "id": "dns-low-consistency",
+      "name": "Nízka DNS consistency",
+      "description": "Consistency score under threshold indicates unstable or filtered resolution.",
+      "match": {
+        "vantageMeta": {
+          "vantage": "dns",
+          "key": "consistencyScore",
+          "lt": 70
+        }
+      },
+      "state": "quantum",
+      "severity": "medium",
+      "riskWeight": 20,
+      "next_actions": [
+        "Zvýš sample resolverov a zopakuj scan",
+        "Skontroluj timeouty a fail rate per resolver"
+      ]
+    },
+    {
+      "id": "ua-status-divergence",
+      "name": "UA status divergence",
+      "description": "Different User-Agents receive different HTTP status codes.",
+      "match": {
+        "anyFinding": {
+          "vantage": "ua",
+          "idEquals": "ua-quantum-diff",
+          "state": "quantum"
+        }
+      },
+      "state": "quantum",
+      "severity": "high",
+      "riskWeight": 30,
+      "next_actions": [
+        "Porovnaj Chrome vs Googlebot vs curl odpovede",
+        "Skontroluj bot filtering / WAF rules",
+        "Over robots.txt a security.txt oddelenie"
+      ]
+    },
+    {
+      "id": "netweb-open-no-http",
+      "name": "Port open, HTTP silent",
+      "description": "TCP web ports open but HTTP(S) paths do not respond.",
+      "match": {
+        "anyFinding": {
+          "vantage": "netweb",
+          "idEquals": "netweb-quantum-port-http",
+          "state": "quantum"
+        }
+      },
+      "state": "quantum",
+      "severity": "high",
+      "riskWeight": 30,
+      "next_actions": [
+        "Manuálny TLS/handshake na :443",
+        "Skontroluj non-HTTP service na web porte",
+        "Over firewall asymetriu (connect vs app)"
+      ]
+    },
+    {
+      "id": "netweb-http-ports-filtered",
+      "name": "HTTP responds, ports filtered",
+      "description": "HTTP works while TCP connect probes report closed/filtered.",
+      "match": {
+        "anyFinding": {
+          "vantage": "netweb",
+          "idEquals": "netweb-quantum-http-port",
+          "state": "quantum"
+        }
+      },
+      "state": "quantum",
+      "severity": "medium",
+      "riskWeight": 15,
+      "next_actions": [
+        "Over middlebox / transparent proxy",
+        "Porovnaj connect timeout vs HTTP client path"
+      ]
+    },
+    {
+      "id": "temporal-ghost-surface",
+      "name": "Ghost surface (temporal)",
+      "description": "Paths that were public in the archive are absent today.",
+      "match": {
+        "anyFinding": {
+          "vantage": "time",
+          "idEquals": "time-temporal-summary",
+          "state": "temporal"
+        }
+      },
+      "state": "temporal",
+      "severity": "medium",
+      "riskWeight": 25,
+      "next_actions": [
+        "Skontroluj ghost paths v archive vs live",
+        "Hľadaj staré admin / backup endpointy",
+        "Zváž historical recon v reportingu"
+      ]
+    },
+    {
+      "id": "all-vantages-silent",
+      "name": "Žiadne observable signály",
+      "description": "No collapsed/quantum/temporal signals from any vantage.",
+      "match": {
+        "allSilent": true
+      },
+      "state": "absent",
+      "severity": "info",
+      "riskWeight": 0,
+      "next_actions": [
+        "Over allowlist a sieťovú dostupnosť targetu",
+        "Skontroluj dig / mock mode a resolvery"
+      ]
+    }
+  ]
+}
