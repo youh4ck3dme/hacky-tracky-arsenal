@@ -3,9 +3,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "eslint.enable": true,
   "eslint.useFlatConfig": true,
-  "eslint.workingDirectories": [
-    { "mode": "auto" }
-  ],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -14,5 +12,6 @@
   ],
   "eslint.options": {
     "overrideConfigFile": "eslint.config.mjs"
-  }
+  },
+  "python.defaultInterpreterPath": "python3"
 }

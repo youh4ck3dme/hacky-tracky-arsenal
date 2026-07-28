@@ -31,15 +31,41 @@ The Schrödinger Observation Platform is built with a **hybrid local/cloud parad
 
 ### Local Dev Setup
 ```bash
-docker-compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d          # Postgres :5432 + Redis :6379
+# optional full container:
+docker compose -f docker-compose.dev.yml --profile app up -d --build
 ```
 
-### GCP Production Setup
-- Environment variables configured via Secret Manager / Cloud Run revision:
+Env (see `.env.example`):
+```bash
+SCHRODINGER_POSTGRES_URL=postgresql://schrodinger:schrodinger_dev_pass@127.0.0.1:5432/schrodinger
+REDIS_URL=redis://127.0.0.1:6379
+```
+
+### Docker / Cloud Run image
+```bash
+docker build -t arsenal:local .
+docker run --rm -p 8080:8080 -e ARSENAL_API_TOKEN=dev -e ARSENAL_PANEL_PASSWORD=23513900 arsenal:local
+```
+Multi-stage root `Dockerfile`: builds pnpm workspace, serves PWA via Express static on `$PORT` (default 8080), includes `dnsutils` + `h4ck-stub`.
+
+### GCP Production Setup (Terraform)
+```bash
+cd infra && cp terraform.tfvars.example terraform.tfvars
+terraform init && terraform apply
+# then: gcloud builds submit --tag $(terraform output -raw container_image_hint) ..
+```
+Details: [`infra/README.md`](../infra/README.md).
+
+Environment (Secret Manager → Cloud Run):
   - `SCHRODINGER_POSTGRES_URL=postgresql://user:pass@/schrodinger?host=/cloudsql/project:region:instance`
+  - `REDIS_URL=redis://10.x.x.x:6379`
+  - `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`
   - `FEATURE_schrodinger_watch=true`
   - `FEATURE_schrodinger_vertex_triage=true`
   - `FEATURE_schrodinger_multi_region=true`
+
+Cloud Scheduler → `POST /api/schrodinger/watch/tick` (Bearer API token + OIDC invoker).
 
 ---
 

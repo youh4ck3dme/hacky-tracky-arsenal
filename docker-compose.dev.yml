@@ -1,4 +1,10 @@
-version: '3.8'
+# Local infra for Schrödinger Observation Platform
+# Usage: docker compose -f docker-compose.dev.yml up -d
+#
+# App still runs via pnpm (HOST=127.0.0.1 PORT=3847). Optional `api` service
+# builds the production Dockerfile against this compose network.
+
+name: schrodinger-dev
 
 services:
   postgres:
@@ -12,16 +18,22 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/src/db/migrations:/docker-entrypoint-initdb.d
+      # Auto-apply SQL migrations on first boot
+      - ./backend/src/db/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U schrodinger -d schrodinger']
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
+    networks:
+      - schrodinger
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: schrodinger-redis
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory', '128mb', '--maxmemory-policy', 'allkeys-lru']
     ports:
       - '6379:6379'
     volumes:
@@ -30,7 +42,62 @@ services:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - schrodinger
+    restart: unless-stopped
+
+  # Optional: full stack image against local Postgres/Redis
+  # docker compose -f docker-compose.dev.yml --profile app up -d --build
+  api:
+    profiles: ['app']
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: schrodinger-api
+    ports:
+      - '8080:8080'
+    environment:
+      HOST: '0.0.0.0'
+      PORT: '8080'
+      NODE_ENV: production
+      H4CK_ROOT: /app/h4ck-stub
+      ARSENAL_API_TOKEN: ${ARSENAL_API_TOKEN:-dev-token-change-me}
+      ARSENAL_PANEL_PASSWORD: ${ARSENAL_PANEL_PASSWORD:-23513900}
+      SCHRODINGER_ALLOWLIST: '*'
+      SCHRODINGER_DNS_MODE: auto
+      SCHRODINGER_SCAN_MODE: ${SCHRODINGER_SCAN_MODE:-mock}
+      FEATURE_schrodinger_persist_postgres: 'true'
+      FEATURE_schrodinger_watch: 'true'
+      FEATURE_schrodinger_v2_providers: 'true'
+      SCHRODINGER_POSTGRES_URL: postgresql://schrodinger:schrodinger_dev_pass@postgres:5432/schrodinger
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - schrodinger
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
       retries: 5
+      start_period: 30s
+
+networks:
+  schrodinger:
+    name: schrodinger-dev
+    driver: bridge
 
 volumes:
   postgres_data:

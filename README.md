@@ -180,5 +180,30 @@ Pred odovzdaním: `./scripts/preflight.sh` → screenshoty → video → Devpost
 ```bash
 pnpm run build
 pnpm run start
-# Frontend statiku servuj z frontend/dist
+# Frontend: Express servuje frontend/dist ak existuje (Docker / Cloud Run)
 ```
+
+### Docker (Cloud Run ready)
+
+```bash
+docker build -t arsenal:local .
+docker run --rm -p 8080:8080 \
+  -e ARSENAL_API_TOKEN=dev-token-change-me \
+  -e ARSENAL_PANEL_PASSWORD=23513900 \
+  arsenal:local
+```
+
+### Local Postgres + Redis
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+### GCP Terraform
+
+```bash
+cd infra && cp terraform.tfvars.example terraform.tfvars
+# set project_id → terraform init && terraform apply
+```
+
+See [infra/README.md](infra/README.md) and [docs/SCHRODINGER-22-PLATFORM.md](docs/SCHRODINGER-22-PLATFORM.md).

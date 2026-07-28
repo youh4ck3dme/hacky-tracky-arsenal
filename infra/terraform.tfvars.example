@@ -1,0 +1,15 @@
+project_id              = "your-gcp-project-id"
+region                  = "europe-west1"
+name_prefix             = "schrodinger"
+cloud_sql_tier          = "db-f1-micro"
+redis_tier              = "BASIC"
+redis_memory_gb         = 1
+enable_watch            = true
+watch_schedule          = "*/15 * * * *"
+allow_unauthenticated   = false
+allowlist               = "*"
+deletion_protection     = true
+# container_image       = "europe-west1-docker.pkg.dev/your-gcp-project-id/schrodinger-images/arsenal:latest"
+# api_token             = ""  # leave empty to auto-generate
+# vapid_public_key      = ""
+# vapid_private_key     = ""

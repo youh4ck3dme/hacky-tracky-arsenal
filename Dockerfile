@@ -30,8 +30,11 @@ COPY tsconfig*.json ./
 RUN pnpm --filter arsenal-backend build \
  && pnpm --filter arsenal-frontend build
 
-# Portable production package for backend only (node_modules pruned)
-RUN pnpm --filter arsenal-backend deploy --prod /out/backend
+# Portable production package for backend only (node_modules pruned).
+# dist/ is gitignored so copy it explicitly after deploy.
+RUN pnpm --filter arsenal-backend deploy --prod /out/backend \
+ && rm -rf /out/backend/dist \
+ && cp -R /app/backend/dist /out/backend/dist
 
 # ── Runtime (Cloud Run) ──────────────────────────────────────────────────────
 FROM node:${NODE_VERSION}-bookworm-slim AS runtime

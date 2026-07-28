@@ -6,6 +6,13 @@ dist/
 backend/data/jobs.json
 backend/data/schrodinger-scans.json
 
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/.terraform.lock.hcl
+infra/terraform.tfvars
+
 # Playwright
 /test-results/
 /playwright-report/

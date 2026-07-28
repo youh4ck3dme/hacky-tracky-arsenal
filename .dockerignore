@@ -18,8 +18,11 @@ node_modules
 frontend/dev-dist
 backend/data
 
-# Tests & local tooling
-tests
+# Tests & local tooling (keep h4ck-stub for container H4CK_ROOT)
+tests/**
+!tests/fixtures/
+!tests/fixtures/h4ck-stub/
+!tests/fixtures/h4ck-stub/**
 test-results
 playwright-report
 playwright.config.ts
@@ -29,7 +32,5 @@ coverage
 docs
 infra/.terraform
 infra/*.tfstate*
+infra/*.tfstate
 infra/.terraform.lock.hcl
-
-# Optional: keep h4ck stub for H4CK_ROOT inside the image
-# (tests/fixtures is ignored above — copy stub explicitly in Dockerfile)

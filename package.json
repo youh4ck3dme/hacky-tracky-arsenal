@@ -26,7 +26,10 @@
     "test:all": "vitest run && ./scripts/smoke-test.sh",
     "test:all:browser": "playwright test --project=chromium --project=pwa --project=stability --project=iphone-17-air",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "docker:build": "docker build -t arsenal:local .",
+    "docker:run": "docker run --rm -p 8080:8080 -e ARSENAL_API_TOKEN=dev-token-change-me -e ARSENAL_PANEL_PASSWORD=23513900 arsenal:local",
+    "infra:dev": "docker compose -f docker-compose.dev.yml up -d"
   },
   "packageManager": "pnpm@11.5.2",
   "devDependencies": {
