@@ -24,10 +24,13 @@
     "test:stability": "playwright test --project=stability",
     "test:pwa-stability": "playwright test --project=pwa --project=stability",
     "test:all": "vitest run && ./scripts/smoke-test.sh",
-    "test:all:browser": "playwright test --project=chromium --project=pwa --project=stability --project=iphone-17-air"
+    "test:all:browser": "playwright test --project=chromium --project=pwa --project=stability --project=iphone-17-air",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "packageManager": "pnpm@11.5.2",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -35,10 +38,13 @@
     "@types/supertest": "^6.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
+    "eslint": "^9.39.5",
+    "globals": "^17.8.0",
     "jsdom": "^26.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "supertest": "^7.0.0",
+    "typescript-eslint": "^8.65.0",
     "vitest": "^3.0.9"
   }
 }

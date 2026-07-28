@@ -47,6 +47,7 @@ Bežné lab použitie: [docs/LAB-WORKFLOW.md](docs/LAB-WORKFLOW.md)
 
 ```bash
 pnpm test              # unit + integration (~5 s)
+pnpm lint              # ESLint flat config (eslint.config.mjs)
 pnpm test:e2e          # smoke API + AI job + Schrödinger (~30–60 s)
 pnpm test:all          # Vitest + smoke E2E (ostré)
 ```

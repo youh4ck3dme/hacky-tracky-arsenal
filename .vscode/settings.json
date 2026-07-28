@@ -1,4 +1,18 @@
 {
   "typescript.tsdk": "frontend/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "eslint.enable": true,
+  "eslint.useFlatConfig": true,
+  "eslint.workingDirectories": [
+    { "mode": "auto" }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.options": {
+    "overrideConfigFile": "eslint.config.mjs"
+  }
 }

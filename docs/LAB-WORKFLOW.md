@@ -92,6 +92,7 @@ Pozri [tests/fixtures/schrodinger/CHANGELOG-UI.md](../tests/fixtures/schrodinger
 
 | Problém | Riešenie |
 |---------|----------|
+| ESLint IDE: `Could not find config file` | Root má `eslint.config.mjs` (flat). Spusti `pnpm install`, reload IDE window. Extension má preferovať workspace ESLint (nie global `/opt/homebrew/...`). |
 | `pnpm install failed` / esbuild | Skontroluj `pnpm-workspace.yaml` → `allowBuilds: esbuild: true`, potom `pnpm install` |
 | Port 3847 obsadený | `lsof -ti :3847 \| xargs kill`, potom `./start.sh` |
 | Frontend neotvorí 127.0.0.1:5173 | Vite binduje na `127.0.0.1` — nepoužívaj `localhost` ak proxy zlyhá |
