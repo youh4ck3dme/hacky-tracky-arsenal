@@ -1,11 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -uo pipefail
 H4CK_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$H4CK_ROOT"
 
-echo "🛠️ Spúšťam kompletnú inštaláciu Arzenálu..."
+echo "🛠️ Spúšťam kompletnú inštaláciu Arzenálu (best public stack)..."
 echo "------------------------------------------"
-
 FAIL=0
 
 run_subscript() {
@@ -35,7 +34,6 @@ echo "------------------------------------------"
 if [ "$FAIL" -eq 0 ]; then
   echo "✅ Inštalácia Arzenálu úspešná."
 else
-  echo "❌ Inštalácia dokončená s chybami — pozri logy vyššie."
+  echo "❌ Inštalácia s chybami — pozri logy."
 fi
-
 exit "$FAIL"

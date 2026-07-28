@@ -25,7 +25,7 @@ _resolve_origin_branch() {
 }
 
 _git_sync_in_dir() {
-  git stash push -u -m "arsenal-pwa sync $(date +%Y%m%d-%H%M%S)" >/dev/null 2>&1 || true
+  git stash push -u -m "arsenal-sync $(date +%Y%m%d-%H%M%S)" >/dev/null 2>&1 || true
   if ! git fetch --prune origin 2>/dev/null; then
     git fetch --depth=1 origin 2>/dev/null || return 1
   fi
@@ -44,13 +44,16 @@ sync_repo() {
     return 1
   fi
 
+  # Progress marker for arsenal-pwa job stream
+  echo "repo_dir=\"$dir\""
+
   if [[ -d "$dir" && ! -d "$dir/.git" ]]; then
     echo "⚠ $dir exists without .git — removing stale directory..."
     rm -rf "$dir"
   fi
 
   if [[ -d "$dir/.git" ]]; then
-    echo "↻ Updating $dir..."
+    echo "↻ Updating $dir (git pull)..."
     if ( cd "$dir" && _git_sync_in_dir ); then
       echo "✓ $dir updated"
       return 0
@@ -63,7 +66,7 @@ sync_repo() {
     rm -rf "$dir"
   fi
 
-  echo "⬇ Cloning $dir..."
+  echo "⬇ git clone --depth=1 $url -> $dir"
   if git clone --quiet --depth=1 "$url" "$dir"; then
     echo "✓ $dir cloned"
     return 0

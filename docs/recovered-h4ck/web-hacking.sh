@@ -1,43 +1,31 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -uo pipefail
 H4CK_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$H4CK_ROOT"
 # shellcheck source=_arsenal-sync.sh
 source "$H4CK_ROOT/_arsenal-sync.sh"
 
-echo "🌐 Spúšťam modul: Web Warfare..."
+echo "🌐 Spúšťam modul: Web Hacking"
+echo "   Top public: SecLists · nuclei · ffuf · sqlmap (opt)"
 
 require_sync SecLists https://github.com/danielmiessler/SecLists
-require_sync_optional Wordpress-Exploit-Framework https://github.com/rastating/wordpress-exploit-framework
-require_sync wpscan https://github.com/wpscanteam/wpscan
+require_sync nuclei https://github.com/projectdiscovery/nuclei
+require_sync ffuf https://github.com/ffuf/ffuf
+require_sync_optional sqlmap https://github.com/sqlmapproject/sqlmap
+require_sync_optional wpscan https://github.com/wpscanteam/wpscan
 
 echo ""
 echo "🔍 INTEGRITY CHECK:"
-if [ -f "wpscan/lib/wpscan.rb" ] || [ -f "wpscan/bin/wpscan" ]; then
-  echo "✅ WPScan je pripravený."
-  ruby wpscan/lib/wpscan.rb --version 2>/dev/null || echo "   ℹ Tip: Spusti 'bundle install' v priečinku wpscan."
-else
-  echo "❌ WPScan nebol nájdený."
-  ARSENAL_SYNC_FAIL=1
-fi
-
-if [ -d "SecLists" ]; then
-  echo "✅ SecLists (Payloady) sú pripravené."
-else
-  ARSENAL_SYNC_FAIL=1
-fi
-
-if [ -d "Wordpress-Exploit-Framework" ]; then
-  echo "✅ Wordpress Exploit Framework je pripravený."
-else
-  echo "⚠ Wordpress Exploit Framework chýba (voliteľný)."
-fi
+[ -d "SecLists" ] && echo "✅ SecLists" || { echo "❌ SecLists"; ARSENAL_SYNC_FAIL=1; }
+[ -d "nuclei" ] && echo "✅ nuclei" || { echo "❌ nuclei"; ARSENAL_SYNC_FAIL=1; }
+[ -d "ffuf" ] && echo "✅ ffuf" || { echo "❌ ffuf"; ARSENAL_SYNC_FAIL=1; }
+[ -d "sqlmap" ] && echo "✅ sqlmap (optional)" || echo "⚠ sqlmap skipped"
+[ -d "wpscan" ] && echo "✅ WPScan (optional)" || echo "⚠ WPScan skipped"
 
 echo "---"
 if [ "$ARSENAL_SYNC_FAIL" -eq 0 ]; then
-  echo "🚀 Web modul je pripravený."
+  echo "🚀 Web modul pripravený. Build: cd nuclei && go build; cd ffuf && go build"
 else
-  echo "❌ Web modul má chyby — pozri log vyššie."
+  echo "❌ Web modul má chyby."
 fi
-
 exit "$ARSENAL_SYNC_FAIL"

@@ -1,43 +1,34 @@
 #!/usr/bin/env bash
-# HACKY TRACKY ADMIN PANEL — terminal menu (recovered marker + module launcher)
-# Original interactive UI body was not in git; modules recovered from Cursor session 2026-06.
+# HACKY TRACKY ADMIN PANEL — best public GitHub stack (2026)
 set -euo pipefail
 H4CK_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$H4CK_ROOT"
 
 banner() {
   cat <<'B'
-╔══════════════════════════════════════╗
-║   HACKY TRACKY ADMIN PANEL           ║
-╚══════════════════════════════════════╝
+╔══════════════════════════════════════════════╗
+║  HACKY TRACKY — Best Public Arsenal Stack    ║
+╚══════════════════════════════════════════════╝
 B
 }
 
-run_mod() {
-  local s="$1"
-  if [[ -f "$H4CK_ROOT/$s" ]]; then
-    bash "$H4CK_ROOT/$s"
-  else
-    echo "Missing: $s" >&2
-    return 1
-  fi
-}
+run_mod() { bash "$H4CK_ROOT/$1"; }
 
 if [[ "${1:-}" == "--non-interactive" ]] || [[ ! -t 0 ]]; then
   banner
-  echo "Modules: exploit web network malware ai full"
+  echo "Modules: exploit | web | network | malware | ai | full"
   exit 0
 fi
 
 banner
-PS3=$'\nVyber modul (číslo): '
+PS3=$'\nVyber modul: '
 options=(
-  "Exploit Tools (exploit-tools.sh)"
-  "Web Hacking (web-hacking.sh)"
-  "Network Tools (network-tools.sh)"
-  "Malware Tools (malware-tools.sh)"
-  "AI / OSINT (ai-tools.sh)"
-  "Full install (full-install.sh)"
+  "Exploit (PEASS + LinEnum + Impacket)"
+  "Web (SecLists + nuclei + ffuf)"
+  "Network (masscan + bettercap + nmap)"
+  "Analysis (theZoo + gitleaks + trivy)"
+  "OSINT (sherlock + theHarvester + amass)"
+  "Full install"
   "Quit"
 )
 select opt in "${options[@]}"; do
