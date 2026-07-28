@@ -65,4 +65,6 @@ export type AuditAction =
   | 'scan.failed'
   | 'scan.cancelled'
   | 'target.blocked'
-  | 'ssrf.blocked';
+  | 'ssrf.blocked'
+  | 'watch.subscribed'
+  | 'watch.unsubscribed';

@@ -7,7 +7,7 @@
 
 import { getAuditLog } from '../auditLog.js';
 import { isEnabled } from '../featureFlags.js';
-import type { SchrodingerScan } from '../types/schrodinger.js';
+import type { SchrodingerScan } from '../../types/schrodinger.js';
 import { sendWatchNotification, type WatchSubscription } from '../pushNotifier.js';
 
 export class WatchEngine {
