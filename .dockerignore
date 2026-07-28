@@ -1,0 +1,35 @@
+# VCS / IDE
+.git
+.github
+.vscode
+.DS_Store
+*.md
+!README.md
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies & build outputs (rebuilt in image)
+node_modules
+**/node_modules
+**/dist
+frontend/dev-dist
+backend/data
+
+# Tests & local tooling
+tests
+test-results
+playwright-report
+playwright.config.ts
+vitest.config.ts
+eslint.config.mjs
+coverage
+docs
+infra/.terraform
+infra/*.tfstate*
+infra/.terraform.lock.hcl
+
+# Optional: keep h4ck stub for H4CK_ROOT inside the image
+# (tests/fixtures is ignored above — copy stub explicitly in Dockerfile)

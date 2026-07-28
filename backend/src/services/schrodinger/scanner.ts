@@ -24,6 +24,9 @@ import {
 import { ScanStore } from './scanStore.js';
 import { assertSafeConnectTargets, SsrfBlockedError } from './ssrf.js';
 import { scanTimeVantage } from './timeVantage.js';
+import { isEnabled } from '../../schrodinger/featureFlags.js';
+import { PostgresStore } from '../../schrodinger/postgresStore.js';
+import { WatchEngine } from '../../schrodinger/watch/watchEngine.js';
 
 class SchrodingerScannerService {
   private listeners = new Map<string, Set<SchrodingerListener>>();
@@ -36,10 +39,24 @@ class SchrodingerScannerService {
   /** SSE event counter per scan — supports Last-Event-ID reconnect. */
   private readonly eventCounters = new Map<string, number>();
 
+  private readonly postgresStore?: PostgresStore;
+  private readonly watchEngine: WatchEngine;
+
   constructor() {
     this.store = new ScanStore(config.scansDataPath);
     this.flags = loadSchrodingerFlags(config.arsenalRoot);
     this.concurrency = new ConcurrencyLimiter(config.schrodinger.maxConcurrent);
+    
+    if (isEnabled('schrodinger.persist.postgres')) {
+      const dbUrl = process.env.SCHRODINGER_POSTGRES_URL;
+      this.postgresStore = new PostgresStore(dbUrl);
+    }
+
+    this.watchEngine = new WatchEngine((target) => this.createScan(target));
+    if (isEnabled('schrodinger.watch')) {
+      this.watchEngine.startLocalRunner();
+    }
+
     const rulesPath = this.flags.rulesPath ?? defaultRulesPath(config.arsenalRoot);
     try {
       this.rules = loadRules(rulesPath).rules;
@@ -122,8 +139,15 @@ class SchrodingerScannerService {
     this.emit(scanId, 'progress', progress);
   }
 
+  getWatchEngine(): WatchEngine {
+    return this.watchEngine;
+  }
+
   private save(scan: SchrodingerScan): void {
     this.store.set(scan);
+    if (this.postgresStore) {
+      void this.postgresStore.saveScan(scan);
+    }
   }
 
   async createScan(target: string): Promise<SchrodingerScan> {
@@ -350,6 +374,9 @@ class SchrodingerScannerService {
       scan.status = 'completed';
       scan.finishedAt = new Date().toISOString();
       this.save(scan);
+      if (this.postgresStore) {
+        void this.postgresStore.saveShadowSnapshot(scan.target, scan.vantages, scan.matrix);
+      }
       this.emitProgress(scanId, {
         vantage: 'done',
         label: 'done',

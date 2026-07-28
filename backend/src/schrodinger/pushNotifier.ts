@@ -5,6 +5,8 @@
  * Fail-open design: errors during notification send do not fail the scan.
  */
 
+import webpush from 'web-push';
+
 export interface WatchSubscription {
   target: string;
   intervalHours: number;
@@ -19,6 +21,21 @@ export interface WatchNotificationPayload {
   title: string;
   body: string;
   url?: string;
+}
+
+// Set VAPID keys if provided
+const publicKey = process.env.VAPID_PUBLIC_KEY;
+const privateKey = process.env.VAPID_PRIVATE_KEY;
+if (publicKey && privateKey) {
+  try {
+    webpush.setVapidDetails(
+      'mailto:security-team@example.com',
+      publicKey,
+      privateKey,
+    );
+  } catch (err) {
+    console.error('[PushNotifier] Failed to configure VAPID details:', err);
+  }
 }
 
 export async function sendWatchNotification(
@@ -42,17 +59,20 @@ export async function sendWatchNotification(
         }),
       });
       webhookSent = res.ok;
-    } catch {
+    } catch (err) {
+      console.warn(`[PushNotifier] Webhook send failed for ${sub.target}:`, err);
       webhookSent = false;
     }
   }
 
-  // 2. VAPID Push dispatch (stub/fail-open)
-  if (sub.pushSubscription) {
+  // 2. VAPID Push dispatch
+  if (sub.pushSubscription && publicKey && privateKey) {
     try {
-      // Stub: in production, web-push library uses VAPID keys from Secret Manager
+      const pushSub = sub.pushSubscription as unknown as webpush.PushSubscription;
+      await webpush.sendNotification(pushSub, JSON.stringify(payload));
       pushSent = true;
-    } catch {
+    } catch (err) {
+      console.warn(`[PushNotifier] VAPID push send failed for ${sub.target}:`, err);
       pushSent = false;
     }
   }

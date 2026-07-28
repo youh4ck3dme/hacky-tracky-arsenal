@@ -1,7 +1,7 @@
 /**
  * Schrödinger P3 — Vertex AI Triage Adapter
  *
- * GenAI triage engine for findings using Vertex AI Gemini API.
+ * GenAI triage engine for findings using Google Gemini API.
  * Accepts JSON findings payload and outputs top 5 prioritized next steps in SK/EN.
  * Fail-open design: returns structured heuristic fallback if API key/network is unavailable.
  * Feature flag: `schrodinger.vertex_triage` (default OFF).
@@ -19,7 +19,6 @@ export interface VertexTriageResponse {
     description: string;
     language: 'sk' | 'en';
   }>;
-  tokenUsage?: { promptTokens: number; completionTokens: number };
   fallbackUsed: boolean;
 }
 
@@ -34,15 +33,96 @@ export async function triageFindingsWithVertexAI(
 
   const apiKey = process.env.VERTEX_AI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return getFallbackTriage(target, findings, language, 'Vertex AI API key is missing (set GEMINI_API_KEY or VERTEX_AI_API_KEY)');
+    return getFallbackTriage(
+      target,
+      findings,
+      language,
+      'Vertex AI API key is missing (set GEMINI_API_KEY or VERTEX_AI_API_KEY)',
+    );
   }
 
+  const promptText = `
+Analyze the security findings for target "${target}" and recommend the top 5 next steps.
+Language of response must be: "${language === 'sk' ? 'Slovak (slovenčina)' : 'English'}".
+
+Input findings JSON:
+${JSON.stringify(findings, null, 2)}
+
+Return ONLY a valid JSON object matching the following structure (no markdown formatting, no code block backticks):
+{
+  "summary": "Short 1-2 sentence overview of the triage status.",
+  "topActions": [
+    {
+      "step": 1,
+      "title": "Title of the action step",
+      "description": "Clear explanation of what the security operator should do.",
+      "language": "${language}"
+    }
+  ]
+}
+`;
+
   try {
-    // Vertex AI / Gemini API call (fail-open)
-    return getFallbackTriage(target, findings, language, 'Vertex AI response generated');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: promptText,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: 'application/json',
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Gemini API returned status ${res.status}`);
+    }
+
+    const data = await res.json() as {
+      candidates?: Array<{
+        content?: {
+          parts?: Array<{ text?: string }>;
+        };
+      }>;
+    };
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (!text) {
+      throw new Error('Empty response from Gemini API');
+    }
+
+    // Clean JSON wrapper if the model returned backticks
+    const cleanedText = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
+    const parsed = JSON.parse(cleanedText) as {
+      summary: string;
+      topActions: Array<{
+        step: number;
+        title: string;
+        description: string;
+        language: 'sk' | 'en';
+      }>;
+    };
+
+    return {
+      target,
+      summary: parsed.summary,
+      topActions: parsed.topActions.slice(0, 5),
+      fallbackUsed: false,
+    };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Vertex AI call failed';
-    return getFallbackTriage(target, findings, language, msg);
+    return getFallbackTriage(target, findings, language, `Gemini API failed: ${msg}`);
   }
 }
 
