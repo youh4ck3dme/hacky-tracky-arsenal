@@ -37,7 +37,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      // Desktop E2E only — phone integrity is the iphone-17-air project
+      testIgnore: '**/iphone-17-air-integrity.spec.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
     {
       name: 'iphone-17-air',
       testMatch: '**/iphone-17-air-integrity.spec.ts',
