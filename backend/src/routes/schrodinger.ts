@@ -148,14 +148,12 @@ schrodingerRouter.post('/watch', (req, res) => {
  */
 schrodingerRouter.post('/watch/tick', async (_req, res) => {
   try {
-    const { WatchEngine } = await import('../schrodinger/watch/watchEngine.js');
     const { isEnabled } = await import('../schrodinger/featureFlags.js');
     if (!isEnabled('schrodinger.watch')) {
       res.status(200).json({ ok: true, skipped: true, reason: 'FEATURE_schrodinger_watch=false' });
       return;
     }
-    // Shared engine instance would live on scanner in a fuller wiring; tick is idempotent no-op if empty.
-    const engine = new WatchEngine();
+    const engine = schrodingerScanner.getWatchEngine();
     await engine.runScheduledChecks();
     res.json({
       ok: true,
