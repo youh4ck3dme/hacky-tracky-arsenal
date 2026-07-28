@@ -33,7 +33,7 @@ cp .env.example .env          # uprav ARSENAL_API_TOKEN
 - Frontend: http://127.0.0.1:5173
 - Backend API: http://127.0.0.1:3847
 
-Pri prvom otvorení zadaj `ARSENAL_API_TOKEN` z `.env` do auth modalu.
+Pri prvom otvorení zadaj **panelové heslo** (default `23513900`, env `ARSENAL_PANEL_PASSWORD`) — funguje rovnako ako API token.
 
 Pred demo alebo lab session:
 
@@ -84,7 +84,8 @@ Automaticky hotové: `./start.sh`, `./scripts/preflight.sh`, smoke test, UI, EN 
 
 | Premenná | Default | Popis |
 |----------|---------|-------|
-| `ARSENAL_API_TOKEN` | `dev-token-change-me` | Bearer token pre API |
+| `ARSENAL_API_TOKEN` | `dev-token-change-me` | Bearer token pre API (voliteľné / advanced) |
+| `ARSENAL_PANEL_PASSWORD` | `23513900` | Jednoduché heslo do UI (AuthGate) |
 | `H4CK_ROOT` | auto (`../` od arsenal-pwa) | Cesta k `h4ck/` arzenálu |
 | `PORT` | `3847` | Backend port |
 | `HOST` | `127.0.0.1` | Bind adresa (lab-only) |

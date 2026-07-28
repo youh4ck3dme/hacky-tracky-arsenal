@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { config } from '../config.js';
+import { isValidCredential } from '../config.js';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const header = req.headers.authorization;
@@ -8,9 +8,9 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     return;
   }
 
-  const token = header.slice(7);
-  if (token !== config.apiToken) {
-    res.status(403).json({ error: 'Invalid API token' });
+  const secret = header.slice(7);
+  if (!isValidCredential(secret)) {
+    res.status(403).json({ error: 'Nesprávne heslo alebo token' });
     return;
   }
 

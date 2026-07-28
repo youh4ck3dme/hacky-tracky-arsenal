@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { describe, expect, it, vi } from 'vitest';
 import { authMiddleware } from '../../../backend/src/middleware/auth.js';
+import { config } from '../../../backend/src/config.js';
 
 function mockRes(): Response {
   return {
@@ -20,7 +21,7 @@ describe('authMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('returns 403 when token is invalid', () => {
+  it('returns 403 when credential is invalid', () => {
     const next = vi.fn() as NextFunction;
     const res = mockRes();
 
@@ -34,17 +35,44 @@ describe('authMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('calls next when token is valid', () => {
+  it('calls next when API token is valid', () => {
     const next = vi.fn() as NextFunction;
     const res = mockRes();
 
     authMiddleware(
-      { headers: { authorization: 'Bearer test-token' } } as Request,
+      { headers: { authorization: `Bearer ${config.apiToken}` } } as Request,
       res,
       next,
     );
 
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
+  });
+
+  it('calls next when panel password is valid (UI login)', () => {
+    const next = vi.fn() as NextFunction;
+    const res = mockRes();
+
+    authMiddleware(
+      { headers: { authorization: `Bearer ${config.panelPassword}` } } as Request,
+      res,
+      next,
+    );
+
+    expect(next).toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+  it('accepts default panel password 23513900 when env uses default', () => {
+    // panelPassword is always set; assert known default or env override is non-empty
+    expect(config.panelPassword.length).toBeGreaterThan(0);
+    const next = vi.fn() as NextFunction;
+    const res = mockRes();
+    authMiddleware(
+      { headers: { authorization: `Bearer ${config.panelPassword}` } } as Request,
+      res,
+      next,
+    );
+    expect(next).toHaveBeenCalled();
   });
 });

@@ -6,22 +6,24 @@ interface AuthGateProps {
 }
 
 export function AuthGate({ onAuthenticated }: AuthGateProps) {
-  const [token, setTokenInput] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token.trim()) {
-      setError('Zadaj API token');
+    const secret = password.trim();
+    if (!secret) {
+      setError('Zadaj heslo');
       return;
     }
-    setToken(token.trim());
+    // Stored & sent as Bearer — backend accepts panel password same as API token.
+    setToken(secret);
     try {
       const res = await fetch('/api/arsenal/status', {
-        headers: { Authorization: `Bearer ${token.trim()}` },
+        headers: { Authorization: `Bearer ${secret}` },
       });
       if (!res.ok) {
-        setError('Neplatný token');
+        setError('Nesprávne heslo');
         return;
       }
       onAuthenticated();
@@ -38,13 +40,14 @@ export function AuthGate({ onAuthenticated }: AuthGateProps) {
       >
         <h2 className="text-xl font-bold text-emerald-400">Arsenal Control Panel</h2>
         <p className="mt-2 text-sm text-slate-400">
-          Zadaj <code className="text-emerald-300">ARSENAL_API_TOKEN</code> z backendu.
+          Zadaj panelové <strong className="text-emerald-300">heslo</strong> a prihlás sa.
         </p>
         <input
           type="password"
-          value={token}
-          onChange={(e) => setTokenInput(e.target.value)}
-          placeholder="API token"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Heslo"
+          autoComplete="current-password"
           className="mt-4 w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-3 text-sm outline-none focus:border-emerald-500"
           autoFocus
         />

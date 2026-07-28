@@ -13,6 +13,8 @@ pnpm test:e2e             # Bash smoke-test (AI job + Schrödinger, ~30–60 s)
 pnpm test:browser         # Playwright browser E2E (Chromium, boots app, ~1–2 min)
 pnpm test:browser:headed  # Same, with a visible browser
 pnpm test:browser:report  # Open the last HTML report
+pnpm test:iphone17air     # 104 integrity tests — iPhone 17 Air clickability (A–Z)
+pnpm test:iphone17air:headed
 pnpm test:all             # Vitest + smoke E2E (strict)
 pnpm test:watch           # Vitest watch mode
 ```
@@ -27,6 +29,7 @@ First run only: install the browser binary with `pnpm exec playwright install ch
 | `tests/unit/frontend/` | Unit | FindingBadge, API token helpers, Shadow Diff (scan diffing) |
 | `tests/integration/` | Integration | Express API via supertest (no real bash jobs) |
 | `tests/e2e/` | Browser E2E | Playwright (Chromium): login, dashboard, Schrödinger scan + Palimpsest timeline |
+| `tests/e2e/iphone-17-air-integrity.spec.ts` | Mobile integrity | **104** A→Z clickability/hit-target tests on iPhone 17 Air (420×912, touch) |
 | `scripts/smoke-test.sh` | E2E | Full stack: health, jobs, SSE, Schrödinger scan |
 
 ## Environment

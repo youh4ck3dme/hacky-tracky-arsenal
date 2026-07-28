@@ -12,6 +12,16 @@ import { defineConfig, devices } from '@playwright/test';
  */
 const FRONTEND_URL = process.env.E2E_BASE_URL ?? 'http://127.0.0.1:5173';
 
+/** Thin flagship profile for integrity / hit-target tests. */
+const IPHONE_17_AIR = {
+  viewport: { width: 420, height: 912 },
+  deviceScaleFactor: 3,
+  isMobile: true,
+  hasTouch: true,
+  userAgent:
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1 ArsenalIntegrity/iPhone17Air',
+};
+
 export default defineConfig({
   testDir: './tests/e2e',
   testMatch: '**/*.spec.ts',
@@ -28,6 +38,15 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'iphone-17-air',
+      testMatch: '**/iphone-17-air-integrity.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        ...IPHONE_17_AIR,
+        browserName: 'chromium',
+      },
+    },
   ],
   webServer: [
     {
@@ -35,6 +54,12 @@ export default defineConfig({
       url: 'http://127.0.0.1:3847/api/health',
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
+      env: {
+        ...process.env,
+        ARSENAL_API_TOKEN: process.env.ARSENAL_API_TOKEN ?? 'dev-token-change-me',
+        ARSENAL_PANEL_PASSWORD: process.env.ARSENAL_PANEL_PASSWORD ?? '23513900',
+        H4CK_ROOT: process.env.H4CK_ROOT ?? `${process.cwd()}/tests/fixtures/h4ck-stub`,
+      },
     },
     {
       command: 'pnpm --filter arsenal-frontend dev',

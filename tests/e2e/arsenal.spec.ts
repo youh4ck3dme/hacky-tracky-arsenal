@@ -1,11 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 
-const TOKEN = process.env.ARSENAL_API_TOKEN ?? 'dev-token-change-me';
+const PASSWORD = process.env.ARSENAL_PANEL_PASSWORD ?? '23513900';
 
-/** Log in through the AuthGate and wait for the dashboard to render. */
+/** Log in through the AuthGate (panel password) and wait for the dashboard. */
 async function login(page: Page): Promise<void> {
   await page.goto('/');
-  await page.getByPlaceholder('API token').fill(TOKEN);
+  await page.getByPlaceholder('Heslo').fill(PASSWORD);
   await page.getByRole('button', { name: 'Prihlásiť sa' }).click();
   await expect(
     page.getByRole('heading', { name: /HACKY TRACKY Arsenal/ }),

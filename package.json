@@ -18,6 +18,8 @@
     "test:browser": "playwright test",
     "test:browser:headed": "playwright test --headed",
     "test:browser:report": "playwright show-report",
+    "test:iphone17air": "playwright test --project=iphone-17-air tests/e2e/iphone-17-air-integrity.spec.ts",
+    "test:iphone17air:headed": "playwright test --project=iphone-17-air tests/e2e/iphone-17-air-integrity.spec.ts --headed",
     "test:all": "vitest run && ./scripts/smoke-test.sh"
   },
   "packageManager": "pnpm@11.5.2",

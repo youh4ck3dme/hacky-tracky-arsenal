@@ -16,6 +16,7 @@ function resolveTestH4ckRoot(): string {
 }
 
 process.env.ARSENAL_API_TOKEN ??= 'test-token';
+process.env.ARSENAL_PANEL_PASSWORD ??= '23513900';
 process.env.H4CK_ROOT ??= resolveTestH4ckRoot();
 process.env.PORT ??= '0';
 process.env.HOST ??= '127.0.0.1';

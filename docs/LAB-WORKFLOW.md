@@ -43,7 +43,7 @@ Otvor http://127.0.0.1:5173 a prihlás sa tokenom z `.env`.
 | Port 3847 obsadený | `lsof -ti :3847 \| xargs kill`, potom `./start.sh` |
 | Frontend neotvorí 127.0.0.1:5173 | Vite binduje na `127.0.0.1` — nepoužívaj `localhost` ak proxy zlyhá |
 | Schrödinger DNS prázdny | Over `dig` v PATH a `h4ck/resolvers/resolvers.txt` |
-| Neplatný token | Hodnota v `.env` musí sedieť s auth modalom |
+| Nesprávne heslo | Default panel heslo je `23513900` (`ARSENAL_PANEL_PASSWORD`); stále funguje aj `ARSENAL_API_TOKEN` |
 
 ## Súvisiace docs
 
