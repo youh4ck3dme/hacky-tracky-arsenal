@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getToolSuggestion } from '../../../backend/src/schrodinger/toolBridge.ts';
+import { getToolSuggestion } from '../../../backend/src/schrodinger/toolBridge.js';
 
 describe('Arsenal Tool Bridge', () => {
   it('maps dns-wildcard-inconsistency to dig', () => {
