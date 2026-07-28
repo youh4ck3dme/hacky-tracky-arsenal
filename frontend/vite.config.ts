@@ -71,7 +71,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3847',
+        target: process.env.ARSENAL_API_PROXY ?? 'http://127.0.0.1:3847',
         changeOrigin: true,
       },
     },
@@ -81,9 +81,10 @@ export default defineConfig({
     port: 4173,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3847',
+        target: process.env.ARSENAL_API_PROXY ?? 'http://127.0.0.1:3847',
         changeOrigin: true,
       },
     },
   },
 });
+

@@ -90,3 +90,6 @@ describe('classifyMatrix', () => {
     expect(matrix[0].state).toBe('collapsed');
   });
 });
+
+// Note: full rules-as-data coverage lives in schrodinger-rules.test.ts
+

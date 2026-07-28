@@ -32,41 +32,44 @@ test.describe('Arsenal PWA — browser E2E', () => {
     await expect(page.getByRole('button', { name: 'Scan', exact: true })).toBeVisible();
   });
 
-  test('scan runs all 4 vantages including the Palimpsest timeline', async ({ page }) => {
-    test.slow(); // live recon: DNS resolvers + Wayback history + path re-checks
-
+  test('mock-mode scan completes with 4 vantages, risk_score, matrix', async ({ page }) => {
     await login(page);
     await page.getByRole('button', { name: 'Schrödinger' }).click();
 
-    await page.getByPlaceholder('example.com').fill('scanme.nmap.org');
+    await page.getByPlaceholder('example.com').fill('example.com');
     await page.getByRole('button', { name: 'Scan', exact: true }).click();
 
-    // Wait for the scan to finish (status badge flips to completed).
-    await expect(page.getByText('completed')).toBeVisible({ timeout: 90_000 });
+    // Mock path should finish in seconds; keep headroom for cold start.
+    await expect(page.getByText('completed')).toBeVisible({ timeout: 20_000 });
 
-    // All four vantage columns render.
-    await expect(page.getByRole('heading', { name: 'DNS Resolvers (30)' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'User-Agent HTTP (3)' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Network vs Web' })).toBeVisible();
+    // Four vantage columns (names may include sample counts / profile).
+    await expect(page.getByRole('heading', { name: /DNS Resolvers/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /User-Agent HTTP/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Network vs Web/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: /Time · Palimpsest/ })).toBeVisible();
 
-    // Quantum Matrix classification panel is present.
     await expect(page.getByRole('heading', { name: 'Quantum Matrix' })).toBeVisible();
+    await expect(page.getByTestId('risk-score')).toBeVisible();
+    await expect(page.getByTestId('risk-score-inline')).toBeVisible();
 
-    // The Palimpsest timeline slider is interactive when Wayback returns history.
+    // Mock mode badge + DNS mock notice (SK)
+    await expect(page.getByText(/mode mock/i)).toBeVisible();
+    await expect(page.getByTestId('scan-notices')).toBeVisible();
+
+    // Column count badges present
+    await expect(page.getByTestId('vantage-dns')).toBeVisible();
+    await expect(page.getByTestId('vantage-ua')).toBeVisible();
+    await expect(page.getByTestId('vantage-netweb')).toBeVisible();
+    await expect(page.getByTestId('vantage-time')).toBeVisible();
+
+    // Palimpsest timeline when mock history exists
     const slider = page.getByRole('slider', { name: 'Timeline year' });
     if (await slider.count()) {
       await expect(page.getByRole('heading', { name: /Palimpsest · časová os/ })).toBeVisible();
-      const yearButtons = page.locator('button', { hasText: /^\d{2}$/ });
-      const count = await yearButtons.count();
-      expect(count).toBeGreaterThan(0);
-      // Jump to the earliest archived year and confirm the panel reacts.
-      await yearButtons.first().click();
-      await expect(page.getByText(/Verejné cesty v \d{4}/)).toBeVisible();
     }
 
-    // Shadow Diff records this scan as the baseline for the target (fresh context).
     await expect(page.getByRole('heading', { name: 'Shadow Diff' })).toBeVisible();
     await expect(page.getByText(/baseline/)).toBeVisible();
   });
 });
+

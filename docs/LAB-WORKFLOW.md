@@ -25,10 +25,52 @@ Otvor http://127.0.0.1:5173 a prihlás sa tokenom z `.env`.
 ## Schrödinger Scan — prakticky
 
 1. Zadaj doménu (nie IP) — napr. vlastný lab target
-2. Scan trvá ~1–2 min (DNS 30 resolverov + UA + port probe)
-3. **Quantum Matrix** = rozpor medzi vantage points → priorita pre manuálnu verifikáciu
+2. Scan trvá ~1–2 min live (DNS sample + UA + port probe); mock path v CI &lt; 3s
+3. **Quantum Matrix** = rules-as-data klasifikácia + **risk_score 0–100**
 4. **Collapsed** = všetci pozorovatelia súhlasia
 5. **Absent** = nedetegované / timeout
+6. Stĺpce ukazujú counts (coll/qnt/tmp/abs) a score badge
+
+## Schrödinger P1
+
+### Env flags
+
+| Premenná | Default | Význam |
+|----------|---------|--------|
+| `SCHRODINGER_SCAN_MODE` | `live` | `mock` = celý scan z fixtures (CI/demo) |
+| `SCHRODINGER_DNS_MODE` | `auto` | `auto` \| `dig` \| `mock` |
+| `SCHRODINGER_ALLOWLIST` | `*` | domény oddelené čiarkou, alebo `*` |
+| `SCHRODINGER_VANTAGES` | `dns,ua,netweb,time` | feature flags per vantage |
+| `SCHRODINGER_PORT_PROFILE` | `quick` | `quick` \| `web` |
+| `SCHRODINGER_DOH` | off | `1` = DoH 2. názor (nie namiesto dig) |
+| `SCHRODINGER_DNS_SAMPLE` | `30` | počet resolverov |
+| `SCHRODINGER_DNS_CONCURRENCY` | `6` | parallel dig pool |
+
+### DNS providery
+
+- **DigDnsProvider** — multi-record, pool, fail per-resolver, consistency score, split-horizon
+- **MockDnsProvider** — keď dig chýba (`auto`) alebo `SCHRODINGER_DNS_MODE=mock` / `SCHRODINGER_SCAN_MODE=mock`
+- Resolvery: `H4CK_ROOT/resolvers/resolvers.txt` → fallback `1.1.1.1`, `8.8.8.8`, `9.9.9.9`
+
+### Mock lab targets
+
+| Target | Čo uvidíš |
+|--------|-----------|
+| `example.com` | collapsed DNS + mock timeline ghost |
+| `quantum.example.com` | split-horizon + UA divergence → vysoký risk |
+| `open-no-http.example.com` | port open / HTTP silent |
+| `silent.example.com` | absent signály |
+
+### GCP path
+
+1. GCE / Cloud Shell: `apt-get install -y dnsutils` (alebo ekvivalent)
+2. `SCHRODINGER_DNS_MODE=auto` (dig) alebo `mock` bez sieťových závislostí
+3. `SCHRODINGER_ALLOWLIST` na tvoje lab domény (nie `*` v zdieľanom env)
+4. Backend ostáva na `127.0.0.1` — reverse proxy + TLS ak treba vzdialený prístup
+
+### UI changelog
+
+Pozri [tests/fixtures/schrodinger/CHANGELOG-UI.md](../tests/fixtures/schrodinger/CHANGELOG-UI.md).
 
 ## Večer — ukončenie
 
@@ -42,7 +84,10 @@ Otvor http://127.0.0.1:5173 a prihlás sa tokenom z `.env`.
 | `pnpm install failed` / esbuild | Skontroluj `pnpm-workspace.yaml` → `allowBuilds: esbuild: true`, potom `pnpm install` |
 | Port 3847 obsadený | `lsof -ti :3847 \| xargs kill`, potom `./start.sh` |
 | Frontend neotvorí 127.0.0.1:5173 | Vite binduje na `127.0.0.1` — nepoužívaj `localhost` ak proxy zlyhá |
-| Schrödinger DNS prázdny | Over `dig` v PATH a `h4ck/resolvers/resolvers.txt` |
+| Schrödinger DNS prázdny | Over `dig` v PATH a `h4ck/resolvers/resolvers.txt`; alebo `SCHRODINGER_DNS_MODE=mock` |
+| dig chýba (strict dig) | `SCHRODINGER_DNS_MODE=auto` (fallback mock) alebo nainštaluj dnsutils |
+| Allowlist deny | Pridaj doménu do `SCHRODINGER_ALLOWLIST` alebo nastav `*` |
+| SSRF block | Resolvovaná IP je privátna/metadata — target nie je safe na connect |
 | Nesprávne heslo | Default panel heslo je `23513900` (`ARSENAL_PANEL_PASSWORD`); stále funguje aj `ARSENAL_API_TOKEN` |
 
 ## Súvisiace docs

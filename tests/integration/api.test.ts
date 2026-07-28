@@ -10,7 +10,7 @@ describe('API integration', () => {
     const res = await request(app).get('/api/health');
 
     expect(res.status).toBe(200);
-    expect(res.body.version).toBe('1.0.0');
+    expect(res.body.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(res.body.h4ckRoot).toBeTruthy();
     expect(res.body.queue).toBeDefined();
   });

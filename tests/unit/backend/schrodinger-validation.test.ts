@@ -15,10 +15,13 @@ describe('schrodingerScanner.validateTarget', () => {
   });
 
   it('rejects IP addresses', () => {
-    expect(() => schrodingerScanner.validateTarget('192.168.1.1')).toThrow(/Invalid domain/);
+    expect(() => schrodingerScanner.validateTarget('192.168.1.1')).toThrow(
+      /IP addresses not supported|Invalid domain/,
+    );
   });
 
   it('rejects invalid domain format', () => {
     expect(() => schrodingerScanner.validateTarget('not-a-domain')).toThrow(/Invalid domain/);
   });
 });
+

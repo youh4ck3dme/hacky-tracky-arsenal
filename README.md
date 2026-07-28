@@ -19,7 +19,7 @@ cp .env.example .env
 ## Požiadavky
 
 - Node.js 20+, pnpm
-- bash, git, dig (pre Schrödinger DNS vantage)
+- bash, git; `dig` odporúčaný pre live DNS vantage (mock fallback ak chýba)
 - Arsenal root musí obsahovať `hacky-admin-menu.sh`
 
 ## Rýchly štart
@@ -106,18 +106,24 @@ Automaticky hotové: `./start.sh`, `./scripts/preflight.sh`, smoke test, UI, EN 
 | GET | `/api/schrodinger/scans/:id` | áno |
 | GET | `/api/schrodinger/scans/:id/stream` | áno (SSE) |
 
-## Schrödinger Scan (hackathon MVP)
+## Schrödinger Scan (P1)
 
 > „CVE nie je fakt — je superpozícia, kým ju nezměříš z správneho uhla.“
 
-Záložka **Schrödinger** v UI — jeden target, 4 vantage points (3× *kde* + 1× *kedy*):
+Záložka **Schrödinger** v UI — jeden target, 4 vantage points (3× *kde* + 1× *kedy*), **risk_score 0–100**, Quantum Matrix rules-as-data:
 
-1. **DNS** — vzorka 30 resolverov z `h4ck/resolvers/resolvers.txt`
-2. **User-Agent** — Chrome, Googlebot, curl HTTP fingerprint
-3. **Network vs Web** — TCP port probe + HTTP path fingerprint
-4. **Time · Palimpsest** — historické vrstvy z Wayback Machine (CDX), timeline slider po rokoch + detekcia „ghost paths" (cesta verejná v minulosti, dnes absent)
+1. **DNS** (`DigDnsProvider` / `MockDnsProvider`) — multi-record (A/AAAA/CNAME/MX/TXT/NS), sample N resolverov z `H4CK_ROOT/resolvers/resolvers.txt` (fallback 1.1.1.1/8.8.8.8/9.9.9.9), parallel pool + timeout/retry/jitter, **consistency score**, split-horizon → quantum. DoH (Google/Cloudflare) voliteľne ako 2. názor.
+2. **User-Agent** — Chrome, Chrome mobile, Googlebot, curl, Safari iOS × paths (`/`, `/robots.txt`, `/wp-admin`, `/.well-known/security.txt`); status/redirects/server/length/title/**body hash** (bez raw cookies).
+3. **Network vs Web** — port profile `quick` | `web` (nie full 65535), TCP + HTTP(S); quantum pri open port + no HTTP. Po DNS: **SSRF re-check** pred connect.
+4. **Time · Palimpsest** — Wayback CDX timeline + ghost paths (temporal).
 
-Findingy: `collapsed` (všetci súhlasia), `quantum` (rozpor medzi uhlami), `temporal` (rozpor v čase — superpozícia minulosť vs dnes), `absent` (nedetegované).
+Findingy: `collapsed` | `quantum` | `temporal` | `absent`. Rules: `shared/schrodinger-rules.json` → severity, risk weight, `next_actions[]`.
+
+**Guardrails:** `SCHRODINGER_ALLOWLIST` + blok súkromných/metadata IP po resolve. Feature flags: `SCHRODINGER_VANTAGES`, `SCHRODINGER_DNS_MODE`, `SCHRODINGER_SCAN_MODE=mock|live`.
+
+**CI:** mock scan p95 &lt; 3s. Live dig na `example.com` soft target &lt; 90s. GCP: GCE/Cloud Shell s `dig`, alebo mock bez dig.
+
+UI changelog: [tests/fixtures/schrodinger/CHANGELOG-UI.md](tests/fixtures/schrodinger/CHANGELOG-UI.md). Lab: [docs/LAB-WORKFLOW.md](docs/LAB-WORKFLOW.md#schrödinger-p1).
 
 > Attack surface nie je snapshot, je sediment. Palimpsest pridáva čas ako 4. uhol pozorovania — bez API kľúča, čisto cez verejné Wayback CDX.
 
@@ -146,6 +152,7 @@ Offline režim zobrazí posledný cached stav arzenálu z IndexedDB.
 - **Určené výhradne pre lokálny pentest lab**
 - Backend binduje na `127.0.0.1` — neexponuj verejne bez TLS
 - Schrödinger scanuj len ciele, ktoré vlastníš alebo máš povolenie testovať
+- Allowlist + SSRF IP block (žiadne connect na 10/8, 127/8, 169.254/16, …)
 - Whitelisted bash skripty — žiadne arbitrary command execution
 
 ## Hackathon submission

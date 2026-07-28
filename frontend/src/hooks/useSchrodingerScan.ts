@@ -17,6 +17,8 @@ export function useSchrodingerScan(scanId: string | null) {
   const [status, setStatus] = useState<ScanStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
+  const [riskScore, setRiskScore] = useState<number | null>(null);
+  const [notices, setNotices] = useState<string[]>([]);
 
   // Reset synchronously when the scan changes so consumers never observe the
   // previous scan's (completed) results during the render that swaps scanId.
@@ -30,6 +32,8 @@ export function useSchrodingerScan(scanId: string | null) {
     setStatus(scanId ? 'running' : null);
     setError(null);
     setConnected(false);
+    setRiskScore(null);
+    setNotices([]);
   }
 
   useEffect(() => {
@@ -88,6 +92,12 @@ export function useSchrodingerScan(scanId: string | null) {
             } else if (eventType === 'done') {
               setStatus(parsed.status as ScanStatus);
               setError(parsed.error ?? null);
+              if (typeof parsed.risk_score === 'number') {
+                setRiskScore(parsed.risk_score);
+              }
+              if (Array.isArray(parsed.notices)) {
+                setNotices(parsed.notices as string[]);
+              }
             }
           }
         }
@@ -103,7 +113,17 @@ export function useSchrodingerScan(scanId: string | null) {
     };
   }, [scanId]);
 
-  return { vantages, matrix, timeline, progress, status, error, connected };
+  return {
+    vantages,
+    matrix,
+    timeline,
+    progress,
+    status,
+    error,
+    connected,
+    riskScore,
+    notices,
+  };
 }
 
 export function mergeScanWithStream(
