@@ -77,3 +77,9 @@ export async function createSchrodingerScan(target: string): Promise<Schrodinger
 export async function fetchSchrodingerScan(id: string): Promise<SchrodingerScan> {
   return apiFetch<SchrodingerScan>(`/api/schrodinger/scans/${id}`);
 }
+
+export async function cancelSchrodingerScan(id: string): Promise<SchrodingerScan> {
+  return apiFetch<SchrodingerScan>(`/api/schrodinger/scans/${id}`, {
+    method: 'DELETE',
+  });
+}

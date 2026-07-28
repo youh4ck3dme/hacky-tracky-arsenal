@@ -30,8 +30,29 @@ export const config = {
   arsenalRoot,
   registryPath: path.resolve(arsenalRoot, 'shared/arsenal-registry.json'),
   jobsDataPath: path.resolve(__dirname, '../data/jobs.json'),
+  /** Schrödinger scan persistence (P0 adapter). */
+  scansDataPath: path.resolve(__dirname, '../data/schrodinger-scans.json'),
   maxLogLines: 5000,
-  version: '1.0.0',
+  version: '1.1.0',
+
+  /** Schrödinger Observation Platform P0 config. */
+  schrodinger: {
+    /** Max parallel scans. */
+    maxConcurrent: Number(process.env.SCHRODINGER_MAX_CONCURRENT ?? 3),
+    /**
+     * Target allowlist — comma-separated domains or globs.
+     * Canonical env: SCHRODINGER_ALLOWLIST (alias: SCHRODINGER_TARGET_ALLOWLIST).
+     * `*` = allow all (default). Example: `*.example.com,test.org`
+     */
+    targetAllowlist:
+      process.env.SCHRODINGER_ALLOWLIST ??
+      process.env.SCHRODINGER_TARGET_ALLOWLIST ??
+      '*',
+    /** Path to JSON file for optional disk persistence. Empty = in-memory only. */
+    storeFile: process.env.SCHRODINGER_STORE_FILE ?? '',
+    /** Max audit log entries in ring buffer. */
+    auditLogSize: Number(process.env.SCHRODINGER_AUDIT_LOG_SIZE ?? 1000),
+  },
 };
 
 /** True if the bearer secret matches the API token or panel password. */

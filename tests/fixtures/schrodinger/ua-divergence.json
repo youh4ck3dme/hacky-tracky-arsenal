@@ -1,0 +1,8 @@
+{
+  "target": "quantum.example.com",
+  "description": "Googlebot vs Chrome body/status divergence on /",
+  "expect": {
+    "quantumFindingId": "ua-quantum-diff",
+    "clients": ["chrome", "chrome-mobile", "googlebot", "curl", "safari-ios"]
+  }
+}

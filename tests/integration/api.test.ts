@@ -10,7 +10,7 @@ describe('API integration', () => {
     const res = await request(app).get('/api/health');
 
     expect(res.status).toBe(200);
-    expect(res.body.version).toBe('1.0.0');
+    expect(res.body.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(res.body.h4ckRoot).toBeTruthy();
     expect(res.body.queue).toBeDefined();
   });
@@ -69,5 +69,80 @@ describe('API integration', () => {
     expect(res.body.id).toBeTruthy();
     expect(res.body.status).toBe('running');
     expect(res.body.target).toBe('example.com');
+  });
+
+  // ── P0: Cancel scan ────────────────────────────────────────────────────
+
+  it('DELETE /api/schrodinger/scans/:id cancels a running scan', async () => {
+    // Create a scan first
+    const createRes = await request(app)
+      .post('/api/schrodinger/scans')
+      .set('Authorization', AUTH)
+      .send({ target: 'example.com' });
+
+    expect(createRes.status).toBe(201);
+    const scanId = createRes.body.id;
+
+    // Cancel it
+    const cancelRes = await request(app)
+      .delete(`/api/schrodinger/scans/${scanId}`)
+      .set('Authorization', AUTH);
+
+    expect(cancelRes.status).toBe(200);
+    expect(cancelRes.body.status).toBe('cancelled');
+    expect(cancelRes.body.error).toContain('cancelled');
+  });
+
+  it('DELETE /api/schrodinger/scans/:id with unknown ID returns 404', async () => {
+    const res = await request(app)
+      .delete('/api/schrodinger/scans/nonexistent')
+      .set('Authorization', AUTH);
+
+    expect(res.status).toBe(404);
+  });
+
+  // ── P0: List scans ─────────────────────────────────────────────────────
+
+  it('GET /api/schrodinger/scans lists recent scans', async () => {
+    const res = await request(app)
+      .get('/api/schrodinger/scans')
+      .set('Authorization', AUTH);
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  // ── P0: Audit log ─────────────────────────────────────────────────────
+
+  it('GET /api/schrodinger/scans/:id/audit returns audit events for a scan', async () => {
+    // Create a scan to generate audit events
+    const createRes = await request(app)
+      .post('/api/schrodinger/scans')
+      .set('Authorization', AUTH)
+      .send({ target: 'example.com' });
+
+    const scanId = createRes.body.id;
+
+    const auditRes = await request(app)
+      .get(`/api/schrodinger/scans/${scanId}/audit`)
+      .set('Authorization', AUTH);
+
+    expect(auditRes.status).toBe(200);
+    expect(Array.isArray(auditRes.body)).toBe(true);
+    // Should have at least scan.created event
+    expect(auditRes.body.some((e: { action: string }) => e.action === 'scan.created')).toBe(true);
+  });
+
+  // ── P0: Feature flags ─────────────────────────────────────────────────
+
+  it('GET /api/schrodinger/flags returns feature flags', async () => {
+    const res = await request(app)
+      .get('/api/schrodinger/flags')
+      .set('Authorization', AUTH);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('schrodinger.guardrails');
+    expect(res.body).toHaveProperty('schrodinger.persist.postgres');
+    expect(res.body).toHaveProperty('schrodinger.v2_providers');
   });
 });

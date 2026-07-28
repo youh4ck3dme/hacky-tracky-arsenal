@@ -1,0 +1,8 @@
+{
+  "target": "open-no-http.example.com",
+  "description": "TCP 80/443 open but HTTP silent → quantum",
+  "expect": {
+    "findingId": "netweb-quantum-port-http",
+    "state": "quantum"
+  }
+}

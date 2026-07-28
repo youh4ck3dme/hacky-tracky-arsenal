@@ -4,6 +4,7 @@ dist/
 .DS_Store
 .env
 backend/data/jobs.json
+backend/data/schrodinger-scans.json
 
 # Playwright
 /test-results/

@@ -11,6 +11,10 @@ import { defineConfig, devices } from '@playwright/test';
  * works out of the box; override with ARSENAL_API_TOKEN to match a custom `.env`.
  */
 const FRONTEND_URL = process.env.E2E_BASE_URL ?? 'http://127.0.0.1:5173';
+/** Dedicated e2e backend port so SCHRODINGER_SCAN_MODE=mock is not skipped by a live lab :3847. */
+const E2E_API_PORT = process.env.E2E_API_PORT ?? '3848';
+const E2E_API = `http://127.0.0.1:${E2E_API_PORT}`;
+
 
 /** Thin flagship profile for integrity / hit-target tests. */
 const IPHONE_17_AIR = {
@@ -78,21 +82,34 @@ export default defineConfig({
   webServer: [
     {
       command: 'pnpm --filter arsenal-backend dev',
-      url: 'http://127.0.0.1:3847/api/health',
-      reuseExistingServer: !process.env.CI,
+      url: `${E2E_API}/api/health`,
+      reuseExistingServer: false,
       timeout: 60_000,
       env: {
         ...process.env,
+        PORT: E2E_API_PORT,
+        HOST: '127.0.0.1',
         ARSENAL_API_TOKEN: process.env.ARSENAL_API_TOKEN ?? 'dev-token-change-me',
         ARSENAL_PANEL_PASSWORD: process.env.ARSENAL_PANEL_PASSWORD ?? '23513900',
         H4CK_ROOT: process.env.H4CK_ROOT ?? `${process.cwd()}/tests/fixtures/h4ck-stub`,
+        // Mock path keeps browser E2E under a few seconds and deterministic.
+        SCHRODINGER_SCAN_MODE: process.env.SCHRODINGER_SCAN_MODE ?? 'mock',
+        SCHRODINGER_DNS_MODE: process.env.SCHRODINGER_DNS_MODE ?? 'mock',
+        SCHRODINGER_ALLOWLIST: process.env.SCHRODINGER_ALLOWLIST ?? '*',
       },
     },
     {
       command: 'pnpm --filter arsenal-frontend dev',
       url: FRONTEND_URL,
-      reuseExistingServer: !process.env.CI,
+      // Must start fresh so ARSENAL_API_PROXY points at the mock e2e backend.
+      reuseExistingServer: false,
       timeout: 60_000,
+      env: {
+        ...process.env,
+        ARSENAL_API_PROXY: E2E_API,
+      },
     },
   ],
 });
+
+

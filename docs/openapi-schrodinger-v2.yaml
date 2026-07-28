@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  title: Schrödinger Observation Platform API
+  version: 2.0.0
+  description: |
+    Production-grade API for the Schrödinger Observation Platform (P0-P3).
+    Supports domain scans, SSE event streaming, audit logs, target watching,
+    Vertex AI triage, and feature flags.
+
+paths:
+  /api/schrodinger/scans:
+    post:
+      summary: Create a new domain observation scan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target]
+              properties:
+                target:
+                  type: string
+                  example: example.com
+      responses:
+        '201':
+          description: Scan created successfully
+        '400':
+          description: Invalid target domain or allowlist denied
+        '429':
+          description: Concurrency limit exceeded
+
+    get:
+      summary: List recent scans
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of scans
+
+  /api/schrodinger/scans/{id}:
+    get:
+      summary: Get scan details by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan details
+        '404':
+          description: Scan not found
+
+    delete:
+      summary: Cancel a running scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scan cancelled
+        '404':
+          description: Scan not found
+
+  /api/schrodinger/scans/{id}/stream:
+    get:
+      summary: SSE event stream for real-time scan updates
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Last-Event-ID
+          in: header
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: SSE event stream (vantage, progress, finding, done)
+
+  /api/schrodinger/scans/{id}/audit:
+    get:
+      summary: Get audit trail for a specific scan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit events
+
+  /api/schrodinger/audit:
+    get:
+      summary: Get full platform audit log
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Platform audit log events
+
+  /api/schrodinger/flags:
+    get:
+      summary: Get current feature flags
+      responses:
+        '200':
+          description: Map of feature flag names to boolean values
+
+  /api/schrodinger/watch:
+    post:
+      summary: Subscribe target to background watch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target]
+              properties:
+                target:
+                  type: string
+                intervalHours:
+                  type: integer
+                  default: 24
+                webhookUrl:
+                  type: string
+      responses:
+        '200':
+          description: Target subscribed
+
+    get:
+      summary: List watch subscriptions
+      responses:
+        '200':
+          description: Active watch subscriptions
+
+  /api/schrodinger/triage:
+    post:
+      summary: Request Vertex AI triage for scan findings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target, findings]
+              properties:
+                target:
+                  type: string
+                language:
+                  type: string
+                  enum: [sk, en]
+                  default: sk
+      responses:
+        '200':
+          description: Vertex AI triage recommendations

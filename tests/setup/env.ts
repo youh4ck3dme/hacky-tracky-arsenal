@@ -20,3 +20,9 @@ process.env.ARSENAL_PANEL_PASSWORD ??= '23513900';
 process.env.H4CK_ROOT ??= resolveTestH4ckRoot();
 process.env.PORT ??= '0';
 process.env.HOST ??= '127.0.0.1';
+// Schrödinger P1 — deterministic fast path in unit/integration CI
+process.env.SCHRODINGER_SCAN_MODE ??= 'mock';
+process.env.SCHRODINGER_DNS_MODE ??= 'mock';
+process.env.SCHRODINGER_ALLOWLIST ??= '*';
+// Give DELETE /scans/:id a window before mock runScan starts (race with <1ms mock)
+process.env.SCHRODINGER_SCAN_START_DELAY_MS ??= '40';

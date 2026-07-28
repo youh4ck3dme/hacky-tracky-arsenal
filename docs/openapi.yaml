@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Hacky Tracky Arsenal + Schrödinger API
+  version: 1.1.0
+  description: |
+    Short OpenAPI draft for lab use. Not a full v2 contract.
+    Auth: Bearer token or panel password on all paths except /api/health.
+  license:
+    name: MIT
+servers:
+  - url: http://127.0.0.1:3847
+    description: Local lab backend
+paths:
+  /api/health:
+    get:
+      summary: Health
+      security: []
+      responses:
+        '200':
+          description: OK
+  /api/schrodinger/scans:
+    get:
+      summary: List recent Schrödinger scans
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Scan list
+    post:
+      summary: Create scan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target]
+              properties:
+                target:
+                  type: string
+                  example: example.com
+      responses:
+        '201':
+          description: Scan created (status running)
+        '400':
+          description: Invalid target / allowlist / dig missing
+        '429':
+          description: Max concurrent scans
+  /api/schrodinger/scans/{id}:
+    get:
+      summary: Get scan by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScanId'
+      responses:
+        '200':
+          description: Scan
+        '404':
+          description: Not found
+    delete:
+      summary: Cancel running or queued scan
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScanId'
+      responses:
+        '200':
+          description: Scan with status cancelled (or terminal if already finished)
+        '404':
+          description: Not found
+  /api/schrodinger/scans/{id}/stream:
+    get:
+      summary: SSE stream (progress, vantage, finding, timeline, done)
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScanId'
+        - name: Last-Event-ID
+          in: header
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: text/event-stream
+  /api/schrodinger/scans/{id}/audit:
+    get:
+      summary: Audit events for one scan
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ScanId'
+      responses:
+        '200':
+          description: Audit events
+  /api/schrodinger/audit:
+    get:
+      summary: Full audit ring buffer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Audit events
+  /api/schrodinger/flags:
+    get:
+      summary: Resolved FEATURE_* flags
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Flag map
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: boolean
+                example:
+                  schrodinger.guardrails: true
+                  schrodinger.persist.postgres: false
+                  schrodinger.v2_providers: true
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    ScanId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ScanStatus:
+      type: string
+      enum: [queued, running, completed, failed, cancelled]
+security:
+  - bearerAuth: []
