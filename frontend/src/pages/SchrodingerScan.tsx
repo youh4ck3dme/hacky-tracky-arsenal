@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { PalimpsestTimeline } from '../components/schrodinger/PalimpsestTimeline';
 import { QuantumMatrix } from '../components/schrodinger/QuantumMatrix';
+import { ScanStatusBadge } from '../components/schrodinger/ScanStatusBadge';
 import { ShadowDiffPanel } from '../components/schrodinger/ShadowDiffPanel';
 import { VantageColumn } from '../components/schrodinger/VantageColumn';
 import { useSchrodingerScan } from '../hooks/useSchrodingerScan';
 import { cancelSchrodingerScan, createSchrodingerScan } from '../lib/api';
+import type { ScanStatus } from '../types/schrodinger';
 import {
   notificationPermission,
   notificationsSupported,
@@ -29,6 +31,17 @@ function skErrorHint(message: string): string | null {
   return null;
 }
 
+const TERMINAL: ScanStatus[] = ['completed', 'failed', 'cancelled'];
+
+/** Prefer terminal scan snapshot (e.g. DELETE cancel) over in-flight SSE status. */
+function resolveScanStatus(
+  scanStatus: ScanStatus | undefined,
+  streamStatus: ScanStatus | null,
+): ScanStatus | undefined {
+  if (scanStatus && TERMINAL.includes(scanStatus)) return scanStatus;
+  return streamStatus ?? scanStatus;
+}
+
 export function SchrodingerScan() {
   const [target, setTarget] = useState('example.com');
   const [scan, setScan] = useState<ScanType | null>(null);
@@ -42,7 +55,8 @@ export function SchrodingerScan() {
   const vantages = stream.vantages.length > 0 ? stream.vantages : (scan?.vantages ?? []);
   const matrix = stream.matrix.length > 0 ? stream.matrix : (scan?.matrix ?? []);
   const timeline = stream.timeline.length > 0 ? stream.timeline : (scan?.timeline ?? []);
-  const status = stream.status ?? scan?.status;
+  // Prefer terminal status from scan (cancel API) over stale stream "running"
+  const status = resolveScanStatus(scan?.status, stream.status);
   const riskScore = stream.riskScore ?? scan?.risk_score ?? null;
   const notices = stream.notices.length > 0 ? stream.notices : (scan?.notices ?? []);
 
@@ -100,6 +114,7 @@ export function SchrodingerScan() {
     try {
       const cancelled = await cancelSchrodingerScan(scan.id);
       setScan(cancelled);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Cancel failed');
     }
@@ -166,9 +181,18 @@ export function SchrodingerScan() {
           <div className="rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-3 text-sm">
             <span className="text-slate-400">Target:</span>{' '}
             <span className="font-mono text-violet-300">{scan.target}</span>
-            <span className="ml-4 text-slate-500">· {status}</span>
+            {status && (
+              <span className="ml-3 inline-flex items-center gap-2">
+                <ScanStatusBadge status={status} />
+              </span>
+            )}
             {stream.connected && status === 'running' && (
               <span className="ml-2 text-emerald-400">● live</span>
+            )}
+            {status === 'cancelled' && (
+              <span className="ml-2 text-xs text-amber-400/90" data-testid="scan-cancelled-hint">
+                Scan zrušený používateľom
+              </span>
             )}
             {scan.mode && (
               <span className="ml-3 text-xs text-slate-500">

@@ -105,6 +105,7 @@ Pozri [tests/fixtures/schrodinger/CHANGELOG-UI.md](../tests/fixtures/schrodinger
 
 - [Schrödinger P0 architecture](SCHRODINGER-20-P0.md)
 - [Schrödinger API draft](SCHRODINGER-API-DRAFT.md)
+- [OpenAPI 3.0 draft](openapi.yaml)
 - [UI changelog (P1)](../tests/fixtures/schrodinger/CHANGELOG-UI.md)
 - [Demo script](DEMO-SCRIPT.md) — 3-min prezentácia
 - [Screenshot guide](SCREENSHOTS.md) — Devpost assets

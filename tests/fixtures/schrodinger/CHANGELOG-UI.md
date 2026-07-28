@@ -4,6 +4,8 @@
 
 - **risk_score 0–100** v Quantum Matrix (badge vpravo) a v riadku statusu po dokončení (`risk N/100`).
 - Mode badge: `mode mock/dig` (a `· DoH` ak je zapnuté).
+- **Scan status badge** (farebný): queued · running · completed · failed · **cancelled** (amber)
+- Tlačidlo **Cancel** počas `running` → amber badge + hint „Scan zrušený používateľom“
 
 ## 4 stĺpce (vantage columns)
 

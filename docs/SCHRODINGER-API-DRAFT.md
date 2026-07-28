@@ -1,5 +1,7 @@
 # Schrödinger API — short draft (not OpenAPI v2)
 
+Machine-readable draft: [`openapi.yaml`](openapi.yaml) (OpenAPI 3.0.3).
+
 Auth: `Authorization: Bearer <token|panel-password>` on all routes except `/api/health`.
 
 | Method | Path | Body / notes |
